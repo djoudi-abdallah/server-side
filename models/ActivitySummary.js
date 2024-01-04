@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const CounterActivity = require("./counters/activitysymmcounter");
 
 const ActivitySummarySchema = new mongoose.Schema({
   code: { type: Number, unique: true, index: true },

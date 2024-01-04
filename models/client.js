@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const CounterClient = require("./counters/clientcounter");
 
 const clientSchema = new mongoose.Schema({
   code: { type: Number, unique: true, index: true },

@@ -1,7 +1,9 @@
 const mongoose = require("mongoose");
 const Produit = require("./Produit");
+const CounterTransfer = require("./counters/transfercounter");
 
 const TransfertsSchema = new mongoose.Schema({
+  code: { type: Number, unique: true, index: true },
   dateTransfert: {
     type: Date,
     default: Date.now,
@@ -30,7 +32,7 @@ const TransfertsSchema = new mongoose.Schema({
 TransfertsSchema.pre("save", async function (next) {
   if (this.isNew) {
     try {
-      const counterDoc = await CounterAchat.findByIdAndUpdate(
+      const counterDoc = await CounterTransfer.findByIdAndUpdate(
         { _id: "id_transfer" },
         { $inc: { seq: 1 } },
         { new: true, upsert: true }

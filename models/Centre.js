@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Counter = require("./counters/centercounter");
 
 const centreSchema = new mongoose.Schema({
   code: { type: Number, unique: true, index: true },

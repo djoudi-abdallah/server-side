@@ -2,17 +2,18 @@ const mongoose = require("mongoose");
 const Produit = require("./Produit");
 
 const AchatsSchema = new mongoose.Schema({
+  code: { type: Number, unique: true, index: true },
   dateAchat: {
     type: Date,
     default: Date.now,
   },
   id_fournisseur: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Number,
     ref: "Fournisseur",
     required: true,
   },
   id_produit: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Number,
     ref: "Produit",
     required: true,
   },

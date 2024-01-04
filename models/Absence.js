@@ -15,7 +15,7 @@ const AbsenceSchema = new mongoose.Schema({
 AbsenceSchema.pre("save", async function (next) {
   if (this.isNew) {
     try {
-      const counter = await Counter.findByIdAndUpdate(
+      const counter = await CounterAbsence.findByIdAndUpdate(
         { _id: "code" },
         { $inc: { seq: 1 } },
         { new: true, upsert: true }

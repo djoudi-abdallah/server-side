@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const CounterMasrouf = require("./counters/masroufcounter");
 
 const MassroufSchema = new mongoose.Schema({
   code: { type: Number, index: true, unique: true },

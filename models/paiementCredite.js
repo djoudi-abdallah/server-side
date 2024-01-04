@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Vente = require("./Vente");
+const CounterPaiementcredite = require("./counters/paiementcreditecounter");
 
 const PaiementCreditSchema = new mongoose.Schema({
   code: { type: Number, index: true, unique: true },

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const CounterFournisseur = require("./counters/fournisseurcounter");
 
 const fournisseurSchema = new mongoose.Schema({
   code: { type: Number, index: true, unique: true },

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Product = require("./product");
+const CounterVente = require("./counters/ventecounter");
 
 const VentesSchema = new mongoose.Schema({
   code: {
@@ -68,7 +69,6 @@ VentesSchema.pre("save", async function (next) {
     } catch (error) {
       next(error);
     }
-  
   }
 });
 

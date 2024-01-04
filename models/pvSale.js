@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const CounterPv = require("./counters/pvsalecounter");
 const PVSaleSchema = new mongoose.Schema({
   code: { type: Number, unique: true, index: true },
   centreID: {

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const CounterReglement = require("./counters/reglementcounter");
 
 const ReglementsSchema = new mongoose.Schema({
   code: { type: Number, unique: true, index: true },

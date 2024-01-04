@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const masrouf = require("./Masrouf");
 const employe = require("./Employe");
+const CounterMonthlySalaries = require("./counters/monthlysalariescounter");
 const MonthlySalarySchema = new mongoose.Schema({
   code: { type: Number, unique: true, index: true },
   employeeID: {
