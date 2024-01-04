@@ -1,18 +1,24 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
+const Product = require("./product");
 
 const VentesSchema = new mongoose.Schema({
+  code: {
+    type: Number,
+    unique: true,
+    index: true,
+  },
   dateVente: {
     type: Date,
     default: Date.now,
   },
   client: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Client',
+    ref: "Client",
     required: true,
   },
   produit: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Produit',
+    ref: "Produit",
     required: true,
   },
   quantite: {
@@ -31,12 +37,41 @@ const VentesSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  resteAPayer: {
-    type: Number,
-    required: true,
+  status: {
+    type: String,
+    enum: ["Entièrement payé", "Partiellement payé", "Non payé"],
+    default: "Non payé",
   },
 });
 
-const Ventes = mongoose.model('Ventes', VentesSchema);
+VentesSchema.pre("save", async function (next) {
+  if (this.isNew) {
+    try {
+      const counterDoc = await CounterVente.findByIdAndUpdate(
+        { _id: "code" },
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true }
+      );
+      this.code = counterDoc.seq;
+    } catch (err) {
+      return next(err);
+    }
+    try {
+      const product = await Product.findOne({ code: this.produit });
+      if (product) {
+        this.prixUnitaire = product.price; // Set unit price from the product
+        this.montantTotal = this.quantite * this.prixUnitaire; // Calculate total sale amount
+      } else {
+        next(new Error("Product not found"));
+      }
+      next();
+    } catch (error) {
+      next(error);
+    }
+  
+  }
+});
+
+const Ventes = mongoose.model("Ventes", VentesSchema);
 
 module.exports = Ventes;

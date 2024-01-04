@@ -1,9 +1,10 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const PVSaleSchema = new mongoose.Schema({
+  code: { type: Number, unique: true, index: true },
   centreID: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Centre',
+    ref: "Centre",
     required: true,
   },
   date: {
@@ -11,13 +12,13 @@ const PVSaleSchema = new mongoose.Schema({
     default: Date.now,
   },
   clientID: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Client', // Create Client model similarly
+    type: Number,
+    ref: "Client", // Create Client model similarly
     required: true,
   },
   produitID: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Produit', // Create Produit model similarly
+    type: Number,
+    ref: "Produit", // Create Produit model similarly
     required: true,
   },
   quantitySold: {
@@ -36,9 +37,26 @@ const PVSaleSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  // Add other relevant fields
 });
 
-const PVSale = mongoose.model('PVSale', PVSaleSchema);
+PVSaleSchema.pre("save", async function (next) {
+  if (this.isNew) {
+    try {
+      const counterDoc = await CounterPv.findByIdAndUpdate(
+        { _id: "code" },
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true }
+      );
+      this.code = counterDoc.seq;
+      next();
+    } catch (err) {
+      next(err);
+    }
+  } else {
+    next();
+  }
+});
+
+const PVSale = mongoose.model("PVSale", PVSaleSchema);
 
 module.exports = PVSale;

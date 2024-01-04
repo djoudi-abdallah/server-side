@@ -1,9 +1,10 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const MassroufSchema = new mongoose.Schema({
+  code: { type: Number, index: true, unique: true },
   employeeID: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Employee', // Create Employee model similarly
+    type: Number,
+    ref: "Employee", // Create Employee model similarly
     required: true,
   },
   amount: {
@@ -14,9 +15,21 @@ const MassroufSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  // Add other relevant fields
+});
+MassroufSchema.pre("save", async function (next) {
+  if (this.isNew) {
+    const counter = await CounterMasrouf.findByIdAndUpdate(
+      { _id: "code" },
+      { $inc: { seq: 1 } },
+      { new: true, upsert: true }
+    );
+    this.code = counter.seq;
+    next();
+  } else {
+    next();
+  }
 });
 
-const Massrouf = mongoose.model('Massrouf', MassroufSchema);
+const Massrouf = mongoose.model("Massrouf", MassroufSchema);
 
 module.exports = Massrouf;

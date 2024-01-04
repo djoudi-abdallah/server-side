@@ -1,9 +1,10 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const ActivitySummarySchema = new mongoose.Schema({
+  code: { type: Number, unique: true, index: true },
   centerID: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Center', // Create Center model similarly
+    ref: "Center", // Create Center model similarly
     required: true,
   },
   date: {
@@ -22,9 +23,24 @@ const ActivitySummarySchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  // Add other relevant fields
 });
 
-const ActivitySummary = mongoose.model('ActivitySummary', ActivitySummarySchema);
+ActivitySummarySchema.pre("save", async function (next) {
+  if (this.isNew) {
+    const counter = await CounterActivity.findByIdAndUpdate(
+      { _id: "code" },
+      { $inc: { seq: 1 } },
+      { new: true, upsert: true }
+    );
+    this.code = counter.seq;
+    next();
+  } else {
+    next();
+  }
+});
+const ActivitySummary = mongoose.model(
+  "ActivitySummary",
+  ActivitySummarySchema
+);
 
 module.exports = ActivitySummary;

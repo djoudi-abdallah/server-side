@@ -1,14 +1,15 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const ProduitStockSchema = new mongoose.Schema({
+  code: { type: Number, unique: true, index: true },
   produit: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Produit',
+    type: Number,
+    ref: "Produit",
     required: true,
   },
   fournisseur: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Fournisseur',
+    type: Number,
+    ref: "Fournisseur",
     required: true,
   },
   dateAchat: {
@@ -24,7 +25,24 @@ const ProduitStockSchema = new mongoose.Schema({
     required: true,
   },
 });
+ProduitStockSchema.pre("save", async function (next) {
+  if (this.isNew) {
+    try {
+      const counterDoc = await CounterProduitStock.findByIdAndUpdate(
+        { _id: "code" },
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true }
+      );
+      this.code = counterDoc.seq;
+      next();
+    } catch (err) {
+      next(err);
+    }
+  } else {
+    next();
+  }
+});
 
-const ProduitStock = mongoose.model('ProduitStock', ProduitStockSchema);
+const ProduitStock = mongoose.model("ProduitStock", ProduitStockSchema);
 
 module.exports = ProduitStock;
