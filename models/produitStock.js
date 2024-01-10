@@ -21,10 +21,6 @@ const ProduitStockSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  prixUnitaire: {
-    type: Number,
-    required: true,
-  },
 });
 ProduitStockSchema.pre("save", async function (next) {
   if (this.isNew) {

@@ -7,7 +7,7 @@ const PaiementCreditSchema = new mongoose.Schema({
   centreID: {
     type: Number,
     ref: "Centre",
-    index: true,
+    required: true,
   },
   date: {
     type: Date,
@@ -56,4 +56,4 @@ PaiementCreditSchema.pre("save", async function (next) {
 
 const PaiementCredit = mongoose.model("PaiementCredit", PaiementCreditSchema);
 
-module.exports = PaiementCredite;
+module.exports = PaiementCredit;

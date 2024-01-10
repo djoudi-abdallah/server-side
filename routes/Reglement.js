@@ -1,9 +1,9 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const Reglements = require('../models/reglements.model');
+const Reglements = require("../models/Reglement");
 
 // Create a new payment
-router.post('/reglements', async (req, res) => {
+router.post("/reglements", async (req, res) => {
   try {
     const newReglement = await Reglements.create(req.body);
     res.status(201).json(newReglement);
@@ -13,7 +13,7 @@ router.post('/reglements', async (req, res) => {
 });
 
 // Get all payments
-router.get('/reglements', async (req, res) => {
+router.get("/reglements", async (req, res) => {
   try {
     const reglements = await Reglements.find();
     res.status(200).json(reglements);
@@ -23,11 +23,11 @@ router.get('/reglements', async (req, res) => {
 });
 
 // Get a specific payment by ID
-router.get('/reglements/:id', async (req, res) => {
+router.get("/reglements/:id", async (req, res) => {
   try {
-    const reglement = await Reglements.findById(req.params.id);
+    const reglement = await Reglements.findOne({ code: req.params.id });
     if (!reglement) {
-      return res.status(404).json({ message: 'Payment not found' });
+      return res.status(404).json({ message: "Payment not found" });
     }
     res.status(200).json(reglement);
   } catch (error) {
@@ -36,15 +36,15 @@ router.get('/reglements/:id', async (req, res) => {
 });
 
 // Update a specific payment by ID
-router.put('/reglements/:id', async (req, res) => {
+router.put("/reglements/:id", async (req, res) => {
   try {
-    const updatedReglement = await Reglements.findByIdAndUpdate(
-      req.params.id,
+    const updatedReglement = await Reglements.findOneAndUpdate(
+      { code: req.params.id },
       req.body,
       { new: true }
     );
     if (!updatedReglement) {
-      return res.status(404).json({ message: 'Payment not found' });
+      return res.status(404).json({ message: "Payment not found" });
     }
     res.status(200).json(updatedReglement);
   } catch (error) {
@@ -53,13 +53,15 @@ router.put('/reglements/:id', async (req, res) => {
 });
 
 // Delete a specific payment by ID
-router.delete('/reglements/:id', async (req, res) => {
+router.delete("/reglements/:id", async (req, res) => {
   try {
-    const deletedReglement = await Reglements.findByIdAndDelete(req.params.id);
+    const deletedReglement = await Reglements.findOneAndDelete({
+      code: req.params.id,
+    });
     if (!deletedReglement) {
-      return res.status(404).json({ message: 'Payment not found' });
+      return res.status(404).json({ message: "Payment not found" });
     }
-    res.status(200).json({ message: 'Payment deleted successfully' });
+    res.status(200).json({ message: "Payment deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

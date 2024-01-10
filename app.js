@@ -3,7 +3,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 const clientRouter = require("./routes/client");
 const produitRouter = require("./routes/Produit");
-const fournniseurRouter = require("./routes/Fournniseur");
+const fournniseurRouter = require("./routes/Fournisseur");
 const centreRouter = require("./routes/Centre");
 const employeRouter = require("./routes/Employe");
 const achatsRouter = require("./routes/Achats");
@@ -13,14 +13,10 @@ const venteRouter = require("./routes/Vente");
 const paiementCreditRouter = require("./routes/paiementCredite");
 const produitstockRouter = require("./routes/produitStock");
 const pvRouter = require("./routes/pvSale");
-const pvRouter = require("./routes/pvSale");
 const absenceRouter = require("./routes/Absence");
 const masroufRouter = require("./routes/Masrouf");
-const pvempadvRouter = require("./routes/pvEmployeeAdvances");
-const monthlysalaryRouter = require("./routes/MonthlySalary");
+const monthlysalaryRouter = require("./routes/MonthlySalaries");
 const activitysummaryRouter = require("./routes/ActivitySummary");
-
-// Define routes and middleware here
 
 const mongoose = require("mongoose");
 
@@ -32,8 +28,6 @@ mongoose
   .catch((error) => {
     console.error("Error connecting to MongoDB:", error);
   });
-
-// Use your routes in the Express app
 
 app.use(express.json());
 
@@ -51,7 +45,6 @@ app.use("/", produitstockRouter); // USe the produit stock routes
 app.use("/", pvRouter); // USe the pv routes
 app.use("/", absenceRouter); // USe the absence routes
 app.use("/", masroufRouter); // USe the absence routes
-app.use("/", pvempadvRouter); // USe the pvemployeevadvances routes
 app.use("/", monthlysalaryRouter); // USe the monthly salary routes
 app.use("/", activitysummaryRouter); // USe the activity summary routes
 

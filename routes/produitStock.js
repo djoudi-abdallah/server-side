@@ -25,7 +25,9 @@ router.get("/produitStock", async (req, res) => {
 // Get a specific stock entry by ID
 router.get("/produitStock/:id", async (req, res) => {
   try {
-    const produitStockEntry = await ProduitStock.findById(req.params.id);
+    const produitStockEntry = await ProduitStock.findOne({
+      code: req.params.id,
+    });
     if (!produitStockEntry) {
       return res.status(404).json({ message: "Stock entry not found" });
     }
@@ -38,8 +40,8 @@ router.get("/produitStock/:id", async (req, res) => {
 // Update a specific stock entry by ID
 router.put("/produitStock/:id", async (req, res) => {
   try {
-    const updatedProduitStock = await ProduitStock.findByIdAndUpdate(
-      req.params.id,
+    const updatedProduitStock = await ProduitStock.findOneAndUpdate(
+      { code: req.params.id },
       req.body,
       { new: true }
     );
@@ -55,9 +57,9 @@ router.put("/produitStock/:id", async (req, res) => {
 // Delete a specific stock entry by ID
 router.delete("/produitStock/:id", async (req, res) => {
   try {
-    const deletedProduitStock = await ProduitStock.findByIdAndDelete(
-      req.params.id
-    );
+    const deletedProduitStock = await ProduitStock.findOneAndDelete({
+      code: req.params.id,
+    });
     if (!deletedProduitStock) {
       return res.status(404).json({ message: "Stock entry not found" });
     }

@@ -25,7 +25,9 @@ router.get("/activity_summaries", async (req, res) => {
 // Get a specific Activity Summary entry by ID
 router.get("/activity_summaries/:id", async (req, res) => {
   try {
-    const activitySummary = await ActivitySummary.findById(req.params.id);
+    const activitySummary = await ActivitySummary.findOne({
+      code: req.params.id,
+    });
     if (!activitySummary) {
       return res
         .status(404)
@@ -40,8 +42,8 @@ router.get("/activity_summaries/:id", async (req, res) => {
 // Update a specific Activity Summary entry by ID
 router.put("/activity_summaries/:id", async (req, res) => {
   try {
-    const updatedActivitySummary = await ActivitySummary.findByIdAndUpdate(
-      req.params.id,
+    const updatedActivitySummary = await ActivitySummary.findOneAndUpdate(
+      { code: req.params.id },
       req.body,
       { new: true }
     );
@@ -59,9 +61,9 @@ router.put("/activity_summaries/:id", async (req, res) => {
 // Delete a specific Activity Summary entry by ID
 router.delete("/activity_summaries/:id", async (req, res) => {
   try {
-    const deletedActivitySummary = await ActivitySummary.findByIdAndDelete(
-      req.params.id
-    );
+    const deletedActivitySummary = await ActivitySummary.findOneAndDelete({
+      code: req.params.id,
+    });
     if (!deletedActivitySummary) {
       return res
         .status(404)

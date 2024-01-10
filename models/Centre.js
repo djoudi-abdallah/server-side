@@ -7,19 +7,18 @@ const centreSchema = new mongoose.Schema({
   name: { type: String, required: true },
   responsable: {
     type: Number,
-    ref: "Employee",
-    index: true,
+    ref: "Employe",
+    required: true,
   },
 });
 centreSchema.pre("save", async function (next) {
-  const doc = this;
   try {
     const counterDoc = await Counter.findByIdAndUpdate(
       { _id: "code" },
       { $inc: { seq: 1 } },
       { new: true, upsert: true }
     );
-    doc.code = counterDoc.seq;
+    this.code = counterDoc.seq;
     next();
   } catch (err) {
     next(err);

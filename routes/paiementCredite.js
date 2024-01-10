@@ -25,7 +25,9 @@ router.get("/paiementscredits", async (req, res) => {
 // Get a specific Paiement Credit entry by ID
 router.get("/paiementscredits/:id", async (req, res) => {
   try {
-    const paiementCredit = await PaiementCredit.findById(req.params.id);
+    const paiementCredit = await PaiementCredit.findOne({
+      code: req.params.id,
+    });
     if (!paiementCredit) {
       return res
         .status(404)
@@ -40,8 +42,8 @@ router.get("/paiementscredits/:id", async (req, res) => {
 // Update a specific Paiement Credit entry by ID
 router.put("/paiementscredits/:id", async (req, res) => {
   try {
-    const updatedPaiementCredit = await PaiementCredit.findByIdAndUpdate(
-      req.params.id,
+    const updatedPaiementCredit = await PaiementCredit.findOneAndUpdate(
+      { code: req.params.id },
       req.body,
       { new: true }
     );
@@ -59,9 +61,9 @@ router.put("/paiementscredits/:id", async (req, res) => {
 // Delete a specific Paiement Credit entry by ID
 router.delete("/paiementscredits/:id", async (req, res) => {
   try {
-    const deletedPaiementCredit = await PaiementCredit.findByIdAndDelete(
-      req.params.id
-    );
+    const deletedPaiementCredit = await PaiementCredit.findOneAndDelete({
+      code: req.params.id,
+    });
     if (!deletedPaiementCredit) {
       return res
         .status(404)

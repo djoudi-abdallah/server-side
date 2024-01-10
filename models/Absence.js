@@ -1,10 +1,11 @@
 const mongoose = require("mongoose");
+const CounterAbsence = require("./counters/absencecounter");
 
 const AbsenceSchema = new mongoose.Schema({
   code: { type: Number, unique: true, index: true },
-  employeeID: {
+  employe: {
     type: Number,
-    ref: "Employee",
+    ref: "Employe",
     required: true,
   },
   date: {

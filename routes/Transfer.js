@@ -25,7 +25,7 @@ router.get("/transferts", async (req, res) => {
 // Get a specific transfer by ID
 router.get("/transferts/:id", async (req, res) => {
   try {
-    const transfert = await Transferts.findById(req.params.id);
+    const transfert = await Transferts.findOne({ code: req.params.id });
     if (!transfert) {
       return res.status(404).json({ message: "Transfer not found" });
     }
@@ -38,8 +38,8 @@ router.get("/transferts/:id", async (req, res) => {
 // Update a specific transfer by ID
 router.put("/transferts/:id", async (req, res) => {
   try {
-    const updatedTransfert = await Transferts.findByIdAndUpdate(
-      req.params.id,
+    const updatedTransfert = await Transferts.findOneAndUpdate(
+      { code: req.params.id },
       req.body,
       { new: true }
     );
@@ -55,7 +55,9 @@ router.put("/transferts/:id", async (req, res) => {
 // Delete a specific transfer by ID
 router.delete("/transferts/:id", async (req, res) => {
   try {
-    const deletedTransfert = await Transferts.findByIdAndDelete(req.params.id);
+    const deletedTransfert = await Transferts.findOneAndDelete({
+      code: req.params.id,
+    });
     if (!deletedTransfert) {
       return res.status(404).json({ message: "Transfer not found" });
     }
