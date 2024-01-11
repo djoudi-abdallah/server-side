@@ -1,68 +1,17 @@
 const express = require("express");
 const router = express.Router();
-const Ventes = require("../models/Vente");
+const ventecontroller = require("../controllers/VenteController");
 
 // Create a new sale
-router.post("/ventes", async (req, res) => {
-  try {
-    const newVente = await Ventes.create(req.body);
-    res.status(201).json(newVente);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+router.post("/ventes", ventecontroller.createVente);
 
 // Get all sales
-router.get("/ventes", async (req, res) => {
-  try {
-    const ventes = await Ventes.find();
-    res.status(200).json(ventes);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
+router.get("/ventes", ventecontroller.getAllVente);
 // Get a specific sale by ID
-router.get("/ventes/:id", async (req, res) => {
-  try {
-    const vente = await Ventes.findOne(req.params.id);
-    if (!vente) {
-      return res.status(404).json({ message: "Sale not found" });
-    }
-    res.status(200).json(vente);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+router.get("/ventes/:id", ventecontroller.getVente);
 
 // Update a specific sale by ID
-router.put("/ventes/:id", async (req, res) => {
-  try {
-    const updatedVente = await Ventes.findOneAndUpdate(
-      { code: req.params.id },
-      req.body,
-      { new: true }
-    );
-    if (!updatedVente) {
-      return res.status(404).json({ message: "Sale not found" });
-    }
-    res.status(200).json(updatedVente);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
+router.put("/ventes/:id", ventecontroller.updateVente);
 // Delete a specific sale by ID
-router.delete("/ventes/:id", async (req, res) => {
-  try {
-    const deletedVente = await Ventes.findOneAndDelete({ code: req.params.id });
-    if (!deletedVente) {
-      return res.status(404).json({ message: "Sale not found" });
-    }
-    res.status(200).json({ message: "Sale deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
+router.delete("/ventes/:id", ventecontroller.deleteVente);
 module.exports = router;

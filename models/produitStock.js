@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const CounterProduitStock = require("./counters/produitstockcounter");
+const Centre = require("./Centre");
 
 const ProduitStockSchema = new mongoose.Schema({
   code: { type: Number, unique: true, index: true },
@@ -8,15 +9,8 @@ const ProduitStockSchema = new mongoose.Schema({
     ref: "Produit",
     required: true,
   },
-  fournisseur: {
-    type: Number,
-    ref: "Fournisseur",
-    required: true,
-  },
-  dateAchat: {
-    type: Date,
-    default: Date.now,
-  },
+
+  centre: { type: Number, ref: "Centre", required: true },
   quantite: {
     type: Number,
     required: true,

@@ -20,7 +20,9 @@ exports.createAchat = async (req, res) => {
     if (!productExists) {
       return res.status(404).send({ message: "Product not found" });
     }
-
+    if (statutPaiement === "Partiellement payé") {
+      fournisseurExists.solde += soldeRestant;
+    }
     // Create the Achat
     const newAchat = new Achat(req.body);
     await newAchat.save();
@@ -41,7 +43,7 @@ exports.createAchat = async (req, res) => {
     }
     if (!statutPaiement) {
       const fournisseur = await Fournisseur.findOne({
-         code: id_fournisseur,
+        code: id_fournisseur,
       });
 
       if (fournisseur) {

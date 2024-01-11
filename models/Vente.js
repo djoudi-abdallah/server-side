@@ -8,17 +8,22 @@ const VentesSchema = new mongoose.Schema({
     unique: true,
     index: true,
   },
+  centre:{
+    type:Number,
+    ref:"Centre",
+    required:[true,"Le centre est obligatoire"]
+  },
   dateVente: {
     type: Date,
     default: Date.now,
   },
   client: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Number,
     ref: "Client",
     required: true,
   },
   produit: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Number,
     ref: "Produit",
     required: true,
   },

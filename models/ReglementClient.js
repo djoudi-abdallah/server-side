@@ -7,16 +7,12 @@ const ReglementsSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  fournisseur: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Fournisseur",
+  client: {
+    type: Number,
+    ref: "client",
     required: true,
   },
-  achats: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Achats",
-    required: true,
-  },
+  
   montantReglement: {
     type: Number,
     required: true,
@@ -41,6 +37,6 @@ ReglementsSchema.pre("save", async function (next) {
   }
 });
 
-const Reglements = mongoose.model("Reglements", ReglementsSchema);
+const ReglementsClient = mongoose.model("ReglementsClient", ReglementsSchema);
 
-module.exports = Reglements;
+module.exports = ReglementsClient;

@@ -1,72 +1,18 @@
 const express = require("express");
 const router = express.Router();
-const ProduitStock = require("../models/produitStock");
+const ProduitStockcontroller = require("../controllers/produitStockController");
 
 // Create a new stock entry
-router.post("/produitStock", async (req, res) => {
-  try {
-    const newProduitStock = await ProduitStock.create(req.body);
-    res.status(201).json(newProduitStock);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+router.post("/produitStock", ProduitStockcontroller.createProduitstock);
 
 // Get all stock entries
-router.get("/produitStock", async (req, res) => {
-  try {
-    const produitStock = await ProduitStock.find();
-    res.status(200).json(produitStock);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+router.get("/produitStock", ProduitStockcontroller.getAllproduitstock);
 
 // Get a specific stock entry by ID
-router.get("/produitStock/:id", async (req, res) => {
-  try {
-    const produitStockEntry = await ProduitStock.findOne({
-      code: req.params.id,
-    });
-    if (!produitStockEntry) {
-      return res.status(404).json({ message: "Stock entry not found" });
-    }
-    res.status(200).json(produitStockEntry);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+router.get("/produitStock/:id", ProduitStockcontroller.getproduitstock);
 
 // Update a specific stock entry by ID
-router.put("/produitStock/:id", async (req, res) => {
-  try {
-    const updatedProduitStock = await ProduitStock.findOneAndUpdate(
-      { code: req.params.id },
-      req.body,
-      { new: true }
-    );
-    if (!updatedProduitStock) {
-      return res.status(404).json({ message: "Stock entry not found" });
-    }
-    res.status(200).json(updatedProduitStock);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
+router.put("/produitStock/:id", ProduitStockcontroller.updateProduitstock);
 // Delete a specific stock entry by ID
-router.delete("/produitStock/:id", async (req, res) => {
-  try {
-    const deletedProduitStock = await ProduitStock.findOneAndDelete({
-      code: req.params.id,
-    });
-    if (!deletedProduitStock) {
-      return res.status(404).json({ message: "Stock entry not found" });
-    }
-    res.status(200).json({ message: "Stock entry deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
+router.delete("/produitStock/:id", ProduitStockcontroller.deleteProduitStock);
 module.exports = router;

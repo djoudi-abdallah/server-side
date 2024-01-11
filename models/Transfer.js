@@ -8,14 +8,14 @@ const TransfertsSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  id_transfer: { type: Number, index: true, unique: true },
+  
   centre: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Number,
     ref: "Centre",
     required: true,
   },
   id_produit: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Number,
     ref: "Produit",
     required: true,
   },

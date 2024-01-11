@@ -1,29 +1,44 @@
-const express = require("express");
-const router = express.Router();
-const Reglements = require("../models/Reglement");
+const Reglements = require("../models/ReglementClient");
+const centre = require("../models/Centre");
+const Client = require("../models/client");
 
 // Create a new payment
-router.post("/reglements", async (req, res) => {
+exports.createreglementclient = async (req, res) => {
+  const { centreID, client } = req.body;
   try {
+    // Check if the centre exists
+    const centreExists = await centre.findOne({
+      code: centreID,
+    });
+    if (!centreExists) {
+      return res.status(404).send({ message: "centre not found" });
+    }
+
+    // Check if the fournisseur exists
+    const clientExists = await Client.findOne({ code: client });
+    if (!clientExists) {
+      return res.status(404).send({ message: "client not found" });
+    }
+
     const newReglement = await Reglements.create(req.body);
     res.status(201).json(newReglement);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-});
+};
 
 // Get all payments
-router.get("/reglements", async (req, res) => {
+exports.getAllreglement = async (req, res) => {
   try {
     const reglements = await Reglements.find();
     res.status(200).json(reglements);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-});
+};
 
 // Get a specific payment by ID
-router.get("/reglements/:id", async (req, res) => {
+exports.getReglement = async (req, res) => {
   try {
     const reglement = await Reglements.findOne({ code: req.params.id });
     if (!reglement) {
@@ -33,10 +48,10 @@ router.get("/reglements/:id", async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-});
+};
 
 // Update a specific payment by ID
-router.put("/reglements/:id", async (req, res) => {
+exports.updatereglement = async (req, res) => {
   try {
     const updatedReglement = await Reglements.findOneAndUpdate(
       { code: req.params.id },
@@ -50,10 +65,10 @@ router.put("/reglements/:id", async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-});
+};
 
 // Delete a specific payment by ID
-router.delete("/reglements/:id", async (req, res) => {
+exports.deleteREglement = async (req, res) => {
   try {
     const deletedReglement = await Reglements.findOneAndDelete({
       code: req.params.id,
@@ -65,6 +80,4 @@ router.delete("/reglements/:id", async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-});
-
-module.exports = router;
+};

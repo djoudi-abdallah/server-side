@@ -11,31 +11,10 @@ const PVSaleSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  clientID: {
-    type: Number,
-    ref: "Client", // Create Client model similarly
+
+  contente: {
+    type: String,
     required: true,
-  },
-  produitID: {
-    type: Number,
-    ref: "Produit", // Create Produit model similarly
-    required: true,
-  },
-  quantitySold: {
-    type: Number,
-    required: true,
-  },
-  unitPrice: {
-    type: Number,
-    required: true,
-  },
-  totalAmount: {
-    type: Number,
-    required: true,
-  },
-  amountPaid: {
-    type: Number,
-    default: 0,
   },
 });
 
