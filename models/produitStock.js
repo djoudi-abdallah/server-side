@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const CounterProduitStock = require("./counters/produitstockcounter");
-const Centre = require("./Centre");
+
 
 const ProduitStockSchema = new mongoose.Schema({
   code: { type: Number, unique: true, index: true },

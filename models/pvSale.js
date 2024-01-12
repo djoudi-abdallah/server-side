@@ -3,7 +3,7 @@ const CounterPv = require("./counters/pvsalecounter");
 const PVSaleSchema = new mongoose.Schema({
   code: { type: Number, unique: true, index: true },
   centreID: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Number,
     ref: "Centre",
     required: true,
   },
