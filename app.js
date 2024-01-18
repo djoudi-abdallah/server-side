@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT;
 const clientRouter = require("./routes/client");
 const produitRouter = require("./routes/Produit");
 const fournniseurRouter = require("./routes/Fournisseur");
@@ -19,7 +19,7 @@ const absenceRouter = require("./routes/Absence");
 const masroufRouter = require("./routes/Masrouf");
 const monthlysalaryRouter = require("./routes/MonthlySalaries");
 const activitysummaryRouter = require("./routes/ActivitySummary");
-
+require("dotenv").config();
 const mongoose = require("mongoose");
 const corsOptions = {
   origin: "http://localhost:3000", // replace with the domain you want to allow
@@ -28,8 +28,9 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+const mongoURI = process.env.MONGO_URI; // Ensure MONGO_URI is set in your environment
 mongoose
-  .connect("mongodb://localhost:27017", {})
+  .connect(mongoURI)
   .then(() => {
     console.log("Connected to MongoDB");
   })
@@ -56,6 +57,6 @@ app.use("/", masroufRouter); // USe the absence routes
 app.use("/", monthlysalaryRouter); // USe the monthly salary routes
 app.use("/", activitysummaryRouter); // USe the activity summary routes
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+app.listen(process.env.PORT, () => {
+  console.log(`Server is running on port ${process.env.PORT}`);
 });
