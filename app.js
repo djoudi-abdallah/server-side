@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
-const port = process.env.PORT || 3000;
+const cors = require("cors");
+
+const port = process.env.PORT || 3001;
 const clientRouter = require("./routes/client");
 const produitRouter = require("./routes/Produit");
 const fournniseurRouter = require("./routes/Fournisseur");
@@ -19,6 +21,12 @@ const monthlysalaryRouter = require("./routes/MonthlySalaries");
 const activitysummaryRouter = require("./routes/ActivitySummary");
 
 const mongoose = require("mongoose");
+const corsOptions = {
+  origin: "http://localhost:3000", // replace with the domain you want to allow
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+
+app.use(cors(corsOptions));
 
 mongoose
   .connect("mongodb://localhost:27017", {})
