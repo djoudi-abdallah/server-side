@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Produit = require("./Produit");
-
+const CounterAchat=require("./counters/achatscounter")
 const AchatsSchema = new mongoose.Schema({
   code: { type: Number, unique: true, index: true },
   dateAchat: {
@@ -27,7 +27,6 @@ const AchatsSchema = new mongoose.Schema({
   },
   montantTotalHT: {
     type: Number,
-    required: true,
   },
   montantVerse: {
     type: Number,
@@ -42,6 +41,9 @@ const AchatsSchema = new mongoose.Schema({
     enum: ["Entièrement payé", "Partiellement payé", "Non payé"],
     default: "Non payé",
   },
+  centre:{ type: Number,
+    ref: "Centre",
+    required: true,}
 });
 
 AchatsSchema.pre("save", async function (next) {

@@ -2,10 +2,18 @@ const Achat = require("../models/Achats");
 const Fournisseur = require("../models/Fournisseur");
 const Product = require("../models/Produit");
 const ProduitStock = require("../models/produitStock");
+const Centre = require("../models/Centre");
 
 exports.createAchat = async (req, res) => {
-  const { id_fournisseur, id_produit, quantite, statutPaiement } = req.body;
-
+  const {
+    id_fournisseur,
+    id_produit,
+    quantite,
+    statutPaiement,
+    soldeRestant,
+    centre,
+  } = req.body;
+  console.log(centre);
   try {
     // Check if the Fournisseur exists
     const fournisseurExists = await Fournisseur.findOne({
@@ -13,6 +21,13 @@ exports.createAchat = async (req, res) => {
     });
     if (!fournisseurExists) {
       return res.status(404).send({ message: "Fournisseur not found" });
+    }
+    // check if the centre exicte
+    const centreExists = await Centre.findOne({
+      code: centre,
+    });
+    if (!centreExists) {
+      return res.status(404).send({ message: "centre not found" });
     }
 
     // Check if the Product exists
@@ -36,8 +51,9 @@ exports.createAchat = async (req, res) => {
       await produitStockEntry.save();
     } else {
       const newProduitStockEntry = new ProduitStock({
-        id_produit: id_produit,
+        produit: id_produit,
         quantite: quantite,
+        centre,
       });
       await newProduitStockEntry.save();
     }
@@ -61,6 +77,7 @@ exports.createAchat = async (req, res) => {
       data: newAchat,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
 };
@@ -89,7 +106,7 @@ exports.getAllAchats = async (req, res) => {
         // Fetch fournisseur details
         const fournisseur = await Fournisseur.findOne({
           code: achat.id_fournisseur,
-        }).select("Nom_fournisseur Prenom_fournisseur"); // Adjust the field name as per your Fournisseur model
+        }).select("nom prenom"); // Adjust the field name as per your Fournisseur model
         achat.fournisseurDetails = fournisseur; // Add fournisseur details to achat
 
         // Fetch product details
@@ -104,6 +121,7 @@ exports.getAllAchats = async (req, res) => {
 
     res.status(200).send(achats);
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
 };

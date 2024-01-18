@@ -60,4 +60,3 @@ app.use("/", activitysummaryRouter); // USe the activity summary routes
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}`);
 });
-
