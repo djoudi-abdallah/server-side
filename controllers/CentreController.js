@@ -1,6 +1,6 @@
-
 const Centre = require("../models/Centre");
 const Employe = require("../models/Employe");
+
 
 // Create a new centre
 exports.createCentre = async (req, res) => {

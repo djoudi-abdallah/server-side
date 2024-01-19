@@ -29,12 +29,19 @@ exports.createProduitstock = async (req, res) => {
 // Get all stock entries
 exports.getAllproduitstock = async (req, res) => {
   try {
-    const produitStock = await ProduitStock.find();
-    res.status(200).json(produitStock);
+    const produitStock = await ProduitStock.find({ centre: req.params.id }).exec();
+    const populatedProduitStock = await Promise.all(produitStock.map(async (stockItem) => {
+      const produit = await Product.findOne({ code: stockItem.produit }).exec();
+      return { ...stockItem.toObject(), produitDetails: produit };
+    }));
+
+    res.status(200).json(populatedProduitStock);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
+
 
 // Get a specific stock entry by ID
 exports.getproduitstock = async (req, res) => {

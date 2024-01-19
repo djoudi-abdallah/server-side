@@ -3,6 +3,10 @@ const ProduitStock = require("../models/produitStock");
 const Centre = require("../models/Centre");
 const Client = require("../models/client");
 
+
+// ... other required models
+
+
 // Create a new sale
 exports.createVente = async (req, res) => {
   const { centre, client, produit, quantite } = req.body;
