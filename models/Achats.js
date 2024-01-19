@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Produit = require("./Produit");
-const CounterAchat=require("./counters/achatscounter")
+const CounterAchat = require("./counters/achatscounter");
 const AchatsSchema = new mongoose.Schema({
   code: { type: Number, unique: true, index: true },
   dateAchat: {
@@ -12,6 +12,8 @@ const AchatsSchema = new mongoose.Schema({
     ref: "Fournisseur",
     required: true,
   },
+  fournisseurname: { type: String, default: "" },
+  fournisseurprenom: { type: String, default: "" },
   id_produit: {
     type: Number,
     ref: "Produit",
@@ -41,20 +43,18 @@ const AchatsSchema = new mongoose.Schema({
     enum: ["Entièrement payé", "Partiellement payé", "Non payé"],
     default: "Non payé",
   },
-  centre:{ type: Number,
-    ref: "Centre",
-    required: true,}
+  centre: { type: Number, ref: "Centre", required: true },
 });
 
 AchatsSchema.pre("save", async function (next) {
   if (this.isNew) {
     try {
       const counterDoc = await CounterAchat.findByIdAndUpdate(
-        { _id: "id_achat" },
+        { _id: "code" },
         { $inc: { seq: 1 } },
         { new: true, upsert: true }
       );
-      this.id_achat = counterDoc.seq;
+      this.code = counterDoc.seq;
       // Continue with the rest of the pre-save logic...
     } catch (err) {
       return next(err);

@@ -12,6 +12,7 @@ exports.createAchat = async (req, res) => {
     statutPaiement,
     soldeRestant,
     centre,
+    prixUnitaireHT,
   } = req.body;
   console.log(centre);
   try {
@@ -22,6 +23,7 @@ exports.createAchat = async (req, res) => {
     if (!fournisseurExists) {
       return res.status(404).send({ message: "Fournisseur not found" });
     }
+
     // check if the centre exicte
     const centreExists = await Centre.findOne({
       code: centre,
@@ -38,8 +40,19 @@ exports.createAchat = async (req, res) => {
     if (statutPaiement === "Partiellement payé") {
       fournisseurExists.solde += soldeRestant;
     }
+    console.log(fournisseurExists);
     // Create the Achat
-    const newAchat = new Achat(req.body);
+    const newAchat = new Achat({
+      id_fournisseur,
+      id_produit,
+      quantite,
+      statutPaiement,
+      prixUnitaireHT,
+      soldeRestant,
+      centre,
+      fournisseurname: fournisseurExists.nom,
+      fournisseurprenom: fournisseurExists.prenom,
+    });
     await newAchat.save();
 
     // Update or create a new entry in ProduitStock
@@ -72,6 +85,7 @@ exports.createAchat = async (req, res) => {
       newAchat.reste = newAchat.montantTotalHT;
       await newAchat.save();
     }
+
     res.status(201).send({
       message: "Achat created and stock updated successfully",
       data: newAchat,
@@ -118,6 +132,7 @@ exports.getAllAchats = async (req, res) => {
         return achat;
       })
     );
+  
 
     res.status(200).send(achats);
   } catch (error) {

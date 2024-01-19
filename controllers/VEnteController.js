@@ -1,21 +1,22 @@
 const Ventes = require("../models/Vente");
 const ProduitStock = require("../models/produitStock");
-const centre = require("../models/Centre");
+const Centre = require("../models/Centre");
+const Client = require("../models/client");
 
 // Create a new sale
 exports.createVente = async (req, res) => {
-  const { centreID, clientID, produit, quantitevente } = req.body;
+  const { centre, client, produit, quantite } = req.body;
   try {
     // Check if the centre exists
-    const centreExists = await centre.findOne({
-      code: centreID,
+    const centreExists = await Centre.findOne({
+      code: centre,
     });
     if (!centreExists) {
       return res.status(404).send({ message: "centre not found" });
     }
-
+console.log(quantite);
     // Check if the client exists
-    const clienttExists = await client.findOne({ code: clientID });
+    const clienttExists = await Client.findOne({ code: client });
     if (!clienttExists) {
       return res.status(404).send({ message: "client not found" });
     }
@@ -23,8 +24,9 @@ exports.createVente = async (req, res) => {
     const stockExists = await ProduitStock.findOne({ produit: produit });
     if (!stockExists) {
       return res.status(404).send({ message: "Product not found" });
-    } else if (stockExists.quantite >= quantitevente) {
-      stockExists.quantite -= quantitevente;
+    }
+    if (stockExists && stockExists.quantite >= quantite) {
+      stockExists.quantite -= quantite;
     } else {
       return res
         .status(404)

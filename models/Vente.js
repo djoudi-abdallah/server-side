@@ -8,10 +8,10 @@ const VentesSchema = new mongoose.Schema({
     unique: true,
     index: true,
   },
-  centre:{
-    type:Number,
-    ref:"Centre",
-    required:[true,"Le centre est obligatoire"]
+  centre: {
+    type: Number,
+    ref: "Centre",
+    required: [true, "Le centre est obligatoire"],
   },
   dateVente: {
     type: Date,
@@ -37,7 +37,6 @@ const VentesSchema = new mongoose.Schema({
   },
   montantTotal: {
     type: Number,
-    required: true,
   },
   montantEncaisse: {
     type: Number,

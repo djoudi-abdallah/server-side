@@ -1,7 +1,7 @@
 const Fournisseur = require("../models/Fournisseur");
 
 // Create a new fournisseur
-exports.createFournisseur=async (req, res) => {
+exports.createFournisseur = async (req, res) => {
   try {
     const fournisseur = new Fournisseur(req.body);
     await fournisseur.save();
@@ -13,7 +13,7 @@ exports.createFournisseur=async (req, res) => {
 
 //read all fournisseur
 
-exports.getAllfournisseur= async (req, res) => {
+exports.getAllfournisseur = async (req, res) => {
   try {
     const fournisseurs = await Fournisseur.find();
     res.send(fournisseurs);
@@ -23,7 +23,7 @@ exports.getAllfournisseur= async (req, res) => {
 };
 
 //read signle fournisseur
-exports.getFournisseur= async (req, res) => {
+exports.getFournisseur = async (req, res) => {
   try {
     const fournisseur = await Fournisseur.findOne({ code: req.params.id });
     if (!fournisseur) {
@@ -35,7 +35,7 @@ exports.getFournisseur= async (req, res) => {
   }
 };
 
-exports.updateFournisseur= async (req, res) => {
+exports.updateFournisseur = async (req, res) => {
   try {
     const fournisseur = await Fournisseur.findOneAndUpdate(
       { code: req.params.id },
@@ -51,7 +51,7 @@ exports.updateFournisseur= async (req, res) => {
   }
 };
 
-exports.deleteFournisseur= async (req, res) => {
+exports.deleteFournisseur = async (req, res) => {
   try {
     const fournisseur = await Fournisseur.findOneAndDelete({
       code: req.params.id,
@@ -64,5 +64,3 @@ exports.deleteFournisseur= async (req, res) => {
     res.status(500).send(error);
   }
 };
-
-

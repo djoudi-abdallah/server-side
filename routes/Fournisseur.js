@@ -12,5 +12,5 @@ router.get("/fournisseurs", fournisseurcontroller.getAllfournisseur);
 //read signle fournisseur
 router.get("/fournisseurs/:id", fournisseurcontroller.getFournisseur);
 router.put("/fournisseurs/:id", fournisseurcontroller.updateFournisseur);
-router.delete("/fournisseurs/:id", fournisseurcontroller.updateFournisseur);
+router.delete("/fournisseurs/:id", fournisseurcontroller.deleteFournisseur);
 module.exports = router;
