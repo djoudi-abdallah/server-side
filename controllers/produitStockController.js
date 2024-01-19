@@ -1,21 +1,20 @@
-
 const ProduitStock = require("../models/produitStock");
 const Product = require("../models/Produit");
-const centre = require("../models/Centre");
+const Centre = require("../models/Centre");
 
 // Create a new stock entry
 exports.createProduitstock = async (req, res) => {
-  const { centreID, produit } = req.body;
+  const { centre, produit } = req.body;
   try {
     // Check if the centre exists
-    const centreExists = await centre.findOne({
-      code: centreID,
+    const centreExists = await Centre.findOne({
+      code: centre,
     });
     if (!centreExists) {
       return res.status(404).send({ message: "centre not found" });
     }
 
-    // Check if the Product exists
+  
     const productExists = await Product.findOne({ code: produit });
     if (!productExists) {
       return res.status(404).send({ message: "Product not found" });
