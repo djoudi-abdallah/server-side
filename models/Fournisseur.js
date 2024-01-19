@@ -7,7 +7,7 @@ const fournisseurSchema = new mongoose.Schema({
   prenom: { type: String, required: true },
   adresse: { type: String, required: true },
   telephone: { type: String, required: true },
-  solde: { type: Number, required: true },
+  solde: { type: Number, default : 0 },
 });
 fournisseurSchema.pre("save", async function (next) {
   if (this.isNew) {
