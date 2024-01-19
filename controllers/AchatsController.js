@@ -4,17 +4,20 @@ const Product = require("../models/Produit");
 const ProduitStock = require("../models/produitStock");
 const Centre = require("../models/Centre");
 
+
+
+
 exports.createAchat = async (req, res) => {
   const {
     id_fournisseur,
     id_produit,
     quantite,
-    statutPaiement,
+    statusPaiement,
     soldeRestant,
     centre,
     prixUnitaireHT,
   } = req.body;
-  console.log(centre);
+  console.log(id_fournisseur);
   try {
     // Check if the Fournisseur exists
     const fournisseurExists = await Fournisseur.findOne({
@@ -37,7 +40,7 @@ exports.createAchat = async (req, res) => {
     if (!productExists) {
       return res.status(404).send({ message: "Product not found" });
     }
-    if (statutPaiement === "Partiellement payé") {
+    if (statusPaiement === "Partiellement payé") {
       fournisseurExists.solde += soldeRestant;
     }
     console.log(fournisseurExists);
@@ -46,7 +49,7 @@ exports.createAchat = async (req, res) => {
       id_fournisseur,
       id_produit,
       quantite,
-      statutPaiement,
+      statusPaiement,
       prixUnitaireHT,
       soldeRestant,
       centre,
@@ -70,7 +73,7 @@ exports.createAchat = async (req, res) => {
       });
       await newProduitStockEntry.save();
     }
-    if (!statutPaiement) {
+    if (!statusPaiement) {
       const fournisseur = await Fournisseur.findOne({
         code: id_fournisseur,
       });
@@ -91,7 +94,7 @@ exports.createAchat = async (req, res) => {
       data: newAchat,
     });
   } catch (error) {
-    console.log(error);
+    
     res.status(500).send(error);
   }
 };

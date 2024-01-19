@@ -6,7 +6,7 @@ const ProduitStockcontroller = require("../controllers/produitStockController");
 router.post("/produitStock", ProduitStockcontroller.createProduitstock);
 
 // Get all stock entries
-router.get("/produitStock", ProduitStockcontroller.getAllproduitstock);
+router.get("/produitStockShop/:id", ProduitStockcontroller.getAllproduitstock);
 
 // Get a specific stock entry by ID
 router.get("/produitStock/:id", ProduitStockcontroller.getproduitstock);

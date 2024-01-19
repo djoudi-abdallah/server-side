@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Produit = require("./Produit");
+const Employe = require("./Employe");
 const CounterAchat = require("./counters/achatscounter");
 const AchatsSchema = new mongoose.Schema({
   code: { type: Number, unique: true, index: true },
@@ -19,6 +20,7 @@ const AchatsSchema = new mongoose.Schema({
     ref: "Produit",
     required: true,
   },
+
   quantite: {
     type: Number,
     required: true,
@@ -38,7 +40,7 @@ const AchatsSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  statutPaiement: {
+  statusPaiement: {
     type: String,
     enum: ["Entièrement payé", "Partiellement payé", "Non payé"],
     default: "Non payé",
@@ -68,7 +70,7 @@ AchatsSchema.pre("save", async function (next) {
       next(new Error("Produit not found"));
     } else {
       this.montantTotalHT = this.quantite * this.prixUnitaireHT;
-      if (this.statutPaiement === "Partiellement payé") {
+      if (this.statusPaiement === "Partiellement payé") {
         this.soldeRestant = this.montantTotalHT - this.versement;
       }
       next();
