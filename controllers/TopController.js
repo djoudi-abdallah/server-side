@@ -4,69 +4,76 @@ const Products = require("../models/Produit");
 const Transfers = require("../models/Transfer");
 const Employe = require("../models/Employe");
 const Fournisseur = require("../models/Fournisseur");
+const Centre = require("../models/Centre");
 
 exports.getCentreOverview = async (req, res) => {
-    try {
-      const centreId = parseInt(req.params.id); // Assuming centre ID is passed as a route parameter
-  
-      // Ensure the centre ID matches the specified centre and is not 1
-      const centreMatch = { $match: { centre: centreId } };
-  
-      // Aggregate top client
-      const topClientResult = await Sales.aggregate([
-        centreMatch,
-        { $group: { _id: "$client", totalValue: { $sum: "$montantTotal" } } },
-        { $sort: { totalValue: -1 } },
-        { $limit: 1 }
-      ]);
-      console.log(topClientResult);
-      const topClientId = topClientResult[0]?._id;
-      const topClientDetails = topClientId ? await Clients.findOne({ code: topClientId }) : null;
-  
-      // Aggregate top product
-      const topProductResult = await Sales.aggregate([
-        centreMatch,
-        { $group: { _id: "$produit", totalSold: { $sum: "$quantite" } } },
-        { $sort: { totalSold: -1 } },
-        { $limit: 1 }
-      ]);
-      const topProductId = topProductResult[0]?._id;
-      const topProductDetails = topProductId ? await Products.findOne({ code: topProductId }) : null;
-  
-      const topEmployeeResult = await Employe.aggregate([
-        centreMatch,
-        { $group: { _id: null, highestSalary: { $max: "$salaire" } } }
-      ]);
-      const topEmployeeDetails = topEmployeeResult[0]?.highestSalary
-        ? await Employe.findOne({ centre: centreId, salaire: topEmployeeResult[0].highestSalary })
-        : null;
-  
-      // Calculate profit
-      const totalSalesResult = await Sales.aggregate([
-        centreMatch,
-        { $group: { _id: null, totalAmount: { $sum: "$montantTotal" } } }
-      ]);
-      const totalTransfersResult = await Transfers.aggregate([
-        centreMatch,
-        { $group: { _id: null, totalAmount: { $sum: "$coutEquivalent" } } }
-      ]);
-  
-      const totalSales = totalSalesResult[0]?.totalAmount || 0;
-      const totalTransfers = totalTransfersResult[0]?.totalAmount || 0;
-      const profit = totalSales - totalTransfers;
-  
-      res.status(200).json({
-        topClient: topClientDetails,
-        topProduct: topProductDetails,
-        topEmployee: topEmployeeDetails, 
-        profit,
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).send({ message: "Internal Server Error" });
-    }
-  };
-  
+  try {
+    const centreId = parseInt(req.params.id); // Assuming centre ID is passed as a route parameter
+
+    // Ensure the centre ID matches the specified centre and is not 1
+    const centreMatch = { $match: { centre: centreId } };
+
+    // Aggregate top client
+    const topClientResult = await Sales.aggregate([
+      centreMatch,
+      { $group: { _id: "$client", totalValue: { $sum: "$montantTotal" } } },
+      { $sort: { totalValue: -1 } },
+      { $limit: 1 },
+    ]);
+    console.log(topClientResult);
+    const topClientId = topClientResult[0]?._id;
+    const topClientDetails = topClientId
+      ? await Clients.findOne({ code: topClientId })
+      : null;
+
+    // Aggregate top product
+    const topProductResult = await Sales.aggregate([
+      centreMatch,
+      { $group: { _id: "$produit", totalSold: { $sum: "$quantite" } } },
+      { $sort: { totalSold: -1 } },
+      { $limit: 1 },
+    ]);
+    const topProductId = topProductResult[0]?._id;
+    const topProductDetails = topProductId
+      ? await Products.findOne({ code: topProductId })
+      : null;
+
+    const topEmployeeResult = await Employe.aggregate([
+      centreMatch,
+      { $group: { _id: null, highestSalary: { $max: "$salaire" } } },
+    ]);
+    const topEmployeeDetails = topEmployeeResult[0]?.highestSalary
+      ? await Employe.findOne({
+          centre: centreId,
+          salaire: topEmployeeResult[0].highestSalary,
+        })
+      : null;
+
+    // Calculate profit
+    const totalSalesResult = await Sales.aggregate([
+      centreMatch,
+      { $group: { _id: null, totalAmount: { $sum: "$montantTotal" } } },
+    ]);
+    const totalTransfersResult = await Transfers.aggregate([
+      centreMatch,
+      { $group: { _id: null, totalAmount: { $sum: "$coutEquivalent" } } },
+    ]);
+
+    const totalSales = totalSalesResult[0]?.totalAmount || 0;
+    const totalTransfers = totalTransfersResult[0]?.totalAmount || 0;
+    const profit = totalSales - totalTransfers;
+
+    res.status(200).json({
+      topClient: topClientDetails,
+      topProduct: topProductDetails,
+      topEmployee: topEmployeeDetails,
+      profit,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: "Internal Server Error" });
+  }
+};
 
 exports.getCentreOverviewForCentre1 = async (req, res) => {
   try {
@@ -141,8 +148,11 @@ exports.getCentreOverviewForCentre1 = async (req, res) => {
 exports.getTopSalesDetails = async (req, res) => {
   try {
     // Exclude centre with code 1 and Aggregate top client based on sales amount
-    const topClient = await Ventes.aggregate([
-      { $match: { centre: { $ne: 1 } } },
+
+    const centreId = parseInt(req.params.id);
+    const centreFilter = { centre: centreId };
+    const topClient = await Sales.aggregate([
+      { $match: centreFilter },
       { $group: { _id: "$client", totalSales: { $sum: "$montantTotal" } } },
       { $sort: { totalSales: -1 } },
       { $limit: 1 },
@@ -153,10 +163,22 @@ exports.getTopSalesDetails = async (req, res) => {
     if (topClient.length > 0) {
       topClientDetails = await Clients.findOne({ code: topClient[0]._id });
     }
+    const topEmployeeResult = await Employe.aggregate([
+      { $match: centreFilter },
+      { $group: { _id: null, highestSalary: { $max: "$salaire" } } },
+    ]);
 
+    // Find the employee details with the highest salary
+    let topEmployeeDetails = null;
+    if (topEmployeeResult.length > 0 && topEmployeeResult[0].highestSalary) {
+      topEmployeeDetails = await Employe.findOne({
+        centre: 3,
+        salaire: topEmployeeResult[0].highestSalary,
+      });
+    }
     // Exclude centre with code 1 and Aggregate top product based on sales quantity
-    const topProduct = await Ventes.aggregate([
-      { $match: { centre: { $ne: 1 } } },
+    const topProduct = await Sales.aggregate([
+      { $match: centreFilter},
       { $group: { _id: "$produit", totalQuantity: { $sum: "$quantite" } } },
       { $sort: { totalQuantity: -1 } },
       { $limit: 1 },
@@ -168,9 +190,22 @@ exports.getTopSalesDetails = async (req, res) => {
       topProductDetails = await Products.findOne({ code: topProduct[0]._id });
     }
 
+    const topCentre = await Sales.aggregate([
+      { $group: { _id: "$centre", totalSales: { $sum: "$montantTotal" } } },
+      { $sort: { totalSales: -1 } },
+      { $limit: 1 },
+    ]);
+    let topCentreDetails = {};
+    if (topCentre.length > 0) {
+      const topCentreId = topCentre[0]._id;
+      topCentreDetails = await Centre.findOne({ code: topCentreId });
+    }
+
     res.status(200).json({
       topClient: topClientDetails,
       topProduct: topProductDetails,
+      topEmployee: topEmployeeDetails,
+      topCenter: topCentreDetails,
     });
   } catch (error) {
     console.error(error);

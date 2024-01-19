@@ -1,10 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const ventecontroller = require("../controllers/VenteController");
+const topController = require("../controllers/TopController");
 
 // Create a new sale
 router.post("/ventes", ventecontroller.createVente);
 
+router.get("/ventesTop", topController.getTopSalesDetails);
 // Get all sales
 router.get("/ventes", ventecontroller.getAllVente);
 // Get a specific sale by ID
