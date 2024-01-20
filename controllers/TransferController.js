@@ -19,6 +19,21 @@ exports.createTrasnsfer = async (req, res) => {
     if (!productExists) {
       return res.status(404).send({ message: "Product not found" });
     }
+
+    const produitStockEntry = await ProduitStock.findOne({
+      id_produit: id_produit,
+    });
+    if (produitStockEntry) {
+      produitStockEntry.quantite += quantite;
+      await produitStockEntry.save();
+    } else {
+      const newProduitStockEntry = new ProduitStock({
+        produit: id_produit,
+        quantite: quantite,
+        centre,
+      });
+      await newProduitStockEntry.save();
+    }
     const newTransfert = await Transferts.create(req.body);
     res.status(201).json(newTransfert);
   } catch (error) {

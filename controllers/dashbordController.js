@@ -1,14 +1,14 @@
-const Vente = require("../models/Vente"); // Replace with your actual Vente model
+const Vente = require("../models/Vente");
+const achat = require("../models/Achats");
 
-// Route to get sales percentage by center
 exports.getcircle = async (req, res) => {
   try {
     // Aggregate sales data
     const salesData = await Vente.aggregate([
       {
         $group: {
-          _id: "$centreCode", // Group by centreCode
-          totalSales: { $sum: "$montantTotal" }, // Replace 'amount' with your field for sales amount
+          _id: "$centre", // Group by the "centre" field in your Vente schema
+          totalSales: { $sum: "$montantTotal" }, // Replace 'montantTotal' with your field for sales amount
         },
       },
       {
@@ -28,6 +28,7 @@ exports.getcircle = async (req, res) => {
       },
       {
         $project: {
+          _id: 0, // Exclude _id field from the result
           centreCode: "$centers.centreCode",
           totalSales: "$centers.totalSales",
           percentage: {
@@ -38,6 +39,74 @@ exports.getcircle = async (req, res) => {
     ]);
 
     res.json(salesData);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};
+
+// Route to get total purchase amount for "Centre 1" by month
+exports.getTotalPurchaseByMonth = async (req, res) => {
+  try {
+    // Aggregate sales data for "Centre 1"
+    const salesData = await achat.aggregate([
+      {
+        $match: {
+          centre: 1, // Filter by "Centre 1"
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: "%Y-%m", // Group by year and month
+              date: "$dateAchat", // Use the sale date for grouping
+            },
+          },
+          totalPurchase: { $sum: "$montantTotalHT" }, // Calculate total purchase amount
+        },
+      },
+      {
+        $sort: {
+          _id: 1, // Sort by month in ascending order
+        },
+      },
+    ]);
+
+    res.json(salesData);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};
+
+exports.getTopProducts = async (req, res) => {
+  try {
+    // Aggregate sales data
+    const topProducts = await Vente.aggregate([
+      {
+        $group: {
+          _id: "$produit", // Group by product
+          totalSales: { $sum: "$montantTotal" }, // Calculate total sales for each product
+        },
+      },
+      {
+        $sort: {
+          totalSales: -1, // Sort in descending order based on total sales
+        },
+      },
+      {
+        $limit: 10, // Limit to the top 10 products
+      },
+      {
+        $lookup: {
+          from: "produits", // Replace with the actual name of your Product collection
+          localField: "_id",
+          foreignField: "code",
+          as: "productDetails",
+        },
+      },
+    ]);
+
+    res.json(topProducts);
   } catch (error) {
     res.status(500).send(error);
   }

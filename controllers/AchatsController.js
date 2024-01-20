@@ -4,9 +4,6 @@ const Product = require("../models/Produit");
 const ProduitStock = require("../models/produitStock");
 const Centre = require("../models/Centre");
 
-
-
-
 exports.createAchat = async (req, res) => {
   const {
     id_fournisseur,
@@ -69,7 +66,7 @@ exports.createAchat = async (req, res) => {
       const newProduitStockEntry = new ProduitStock({
         produit: id_produit,
         quantite: quantite,
-        centre,
+        centre: 1,
       });
       await newProduitStockEntry.save();
     }
@@ -94,7 +91,6 @@ exports.createAchat = async (req, res) => {
       data: newAchat,
     });
   } catch (error) {
-    
     res.status(500).send(error);
   }
 };
@@ -135,7 +131,6 @@ exports.getAllAchats = async (req, res) => {
         return achat;
       })
     );
-  
 
     res.status(200).send(achats);
   } catch (error) {

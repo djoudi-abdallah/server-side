@@ -19,6 +19,7 @@ const absenceRouter = require("./routes/Absence");
 const masroufRouter = require("./routes/Masrouf");
 const monthlysalaryRouter = require("./routes/MonthlySalaries");
 const activitysummaryRouter = require("./routes/ActivitySummary");
+const daschbordRouter = require("./routes/dashbord");
 require("dotenv").config();
 const mongoose = require("mongoose");
 const corsOptions = {
@@ -56,6 +57,7 @@ app.use("/", absenceRouter); // USe the absence routes
 app.use("/", masroufRouter); // USe the absence routes
 app.use("/", monthlysalaryRouter); // USe the monthly salary routes
 app.use("/", activitysummaryRouter); // USe the activity summary routes
+app.use("/", daschbordRouter);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}`);
