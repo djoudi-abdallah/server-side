@@ -52,11 +52,11 @@ exports.getAllVente = async (req, res) => {
     const clients = await Client.find();
     const produits = await Product.find();
     const clientLookup = clients.reduce((acc, client) => {
-      acc[client.code] = client.nom; // Replace 'nom' with the actual field name for the client's name
+      acc[client.code] = client.nom;
       return acc;
     }, {});
     const produitLookup = produits.reduce((acc, produit) => {
-      acc[produit.code] = produit.name; // Replace 'nom' with the actual field name for the product's name
+      acc[produit.code] = produit.name; 
       return acc;
     }, {});
 

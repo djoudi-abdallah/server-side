@@ -1,21 +1,21 @@
 const Transferts = require("../models/Transfer");
 const Product = require("../models/Produit");
-const centre = require("../models/Centre");
+const Centre = require("../models/Centre");
 
 // Create a new transfer
 exports.createTrasnsfer = async (req, res) => {
-  const { centreID, produit } = req.body;
+  const { centre, id_produit } = req.body;
   try {
     // Check if the centre exists
-    const centreExists = await centre.findOne({
-      code: centreID,
+    const centreExists = await Centre.findOne({
+      code: centre,
     });
     if (!centreExists) {
       return res.status(404).send({ message: "centre not found" });
     }
 
     // Check if the Product exists
-    const productExists = await Product.findOne({ code: produit });
+    const productExists = await Product.findOne({ code: id_produit });
     if (!productExists) {
       return res.status(404).send({ message: "Product not found" });
     }
@@ -29,7 +29,7 @@ exports.createTrasnsfer = async (req, res) => {
 // Get all transfers
 exports.getAlltransfer = async (req, res) => {
   try {
-    const transferts = await Transferts.find({centre:req.params.id});
+    const transferts = await Transferts.find({ centre: req.params.id });
     res.status(200).json(transferts);
   } catch (error) {
     res.status(500).json({ error: error.message });

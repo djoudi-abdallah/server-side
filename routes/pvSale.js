@@ -6,9 +6,9 @@ const PVcontroller = require("../controllers/pvSAleController");
 router.post("/pvsales", PVcontroller.createPv);
 
 // Get all PV sale entries
-router.get("/pvsales", PVcontroller.getAllpv);
+router.get("/pvsales/:id", PVcontroller.getAllpv);
 // Get a specific PV sale entry by ID
-router.get("/pvsales/:id", PVcontroller.getpv);
+router.get("/pvsale/:id", PVcontroller.getpv);
 
 // Update a specific PV sale entry by ID
 router.put("/pvsales/:id", PVcontroller.updatePV);

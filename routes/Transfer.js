@@ -6,7 +6,7 @@ const Transfertcontroller = require("../controllers/TransferController");
 router.post("/transferts", Transfertcontroller.createTrasnsfer);
 
 // Get all transfers
-router.get("/transfertsShop/id", Transfertcontroller.getAlltransfer);
+router.get("/transfertsShop/:id", Transfertcontroller.getAlltransfer);
 
 // Get a specific transfer by ID
 router.get("/transferts/:id", Transfertcontroller.gettransfer);

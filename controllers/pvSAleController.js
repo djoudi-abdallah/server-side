@@ -22,7 +22,7 @@ exports.createPv = async (req, res) => {
 // Get all PV sale entries
 exports.getAllpv = async (req, res) => {
   try {
-    const pvSales = await PVSale.find();
+    const pvSales = await PVSale.find({ centreID: req.params.id });
     res.status(200).json(pvSales);
   } catch (error) {
     res.status(500).json({ error: error.message });
