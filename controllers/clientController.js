@@ -1,9 +1,18 @@
 const Client = require("../models/client"); // Import the Client model
+const Centre = require("../models/Centre");
 
 // Create a new client
 exports.createClient = async (req, res) => {
-  
   try {
+    const { centre } = req.body;
+    // Check if the centre exists
+    const centreExists = await Centre.findOne({
+      code: centre,
+    });
+    if (!centreExists) {
+      return res.status(404).send({ message: "centre not found" });
+    }
+
     const client = new Client(req.body);
     await client.save();
     res.status(201).send(client);
@@ -13,10 +22,11 @@ exports.createClient = async (req, res) => {
   }
 };
 
-exports.getAllclients = async (req, res) => {
+exports.getAllClients = async (req, res) => {
   try {
-    const clients = await Client.find();
-    res.send(clients);
+    let clients = await Client.find({ centre: req.params.id });
+
+    res.status(200).send(clients);
   } catch (error) {
     res.status(500).send(error);
   }

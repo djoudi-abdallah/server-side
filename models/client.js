@@ -8,6 +8,7 @@ const clientSchema = new mongoose.Schema({
   adresse: { type: String, required: true },
   telephone: { type: String, required: true },
   credit: { type: Number, default: 0 },
+  centre: { type: Number, ref: "Centre", required: true },
 });
 
 clientSchema.pre("save", async function (next) {

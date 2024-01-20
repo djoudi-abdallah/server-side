@@ -8,9 +8,9 @@ router.post("/ventes", ventecontroller.createVente);
 
 router.get("/ventesTop", topController.getTopSalesDetails);
 // Get all sales
-router.get("/ventes", ventecontroller.getAllVente);
+router.get("/ventes/:id", ventecontroller.getAllVente);
 // Get a specific sale by ID
-router.get("/ventes/:id", ventecontroller.getVente);
+router.get("/vente/:id", ventecontroller.getVente);
 
 // Update a specific sale by ID
 router.put("/ventes/:id", ventecontroller.updateVente);

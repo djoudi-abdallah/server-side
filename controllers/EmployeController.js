@@ -16,20 +16,9 @@ exports.createEmploye = async (req, res) => {
 // Get all employes with additional details
 exports.getAllemploye = async (req, res) => {
   try {
-    let employes = await Employe.find();
-    employes = await Promise.all(
-      employes.map(async (employe) => {
-        employe = employe.toObject(); // Convert Mongoose document to a plain JavaScript object
-
-        // Fetch client details
-        const centre = await Centre.findOne({
-          code: employe.centre,
-        }).select("nom ");
-        employe.centreDetails = centre; // Add client details to employe
-
-        return employe;
-      })
-    );
+    let employes = await Employe.find({centre:req.params.id});
+   
+   
 
     res.status(200).send(employes);
   } catch (error) {

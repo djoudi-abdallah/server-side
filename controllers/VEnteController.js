@@ -46,7 +46,7 @@ exports.createVente = async (req, res) => {
 exports.getAllVente = async (req, res) => {
   try {
     // Fetch all ventes
-    const ventes = await Ventes.find();
+    const ventes = await Ventes.find({centre:req.params.id});
 
     // Fetch all clients and products and create lookup objects
     const clients = await Client.find();
