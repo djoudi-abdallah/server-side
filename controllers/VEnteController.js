@@ -2,10 +2,9 @@ const Ventes = require("../models/Vente");
 const ProduitStock = require("../models/produitStock");
 const Centre = require("../models/Centre");
 const Client = require("../models/client");
-
+const Product = require("../models/Produit");
 
 // ... other required models
-
 
 // Create a new sale
 exports.createVente = async (req, res) => {
@@ -18,7 +17,7 @@ exports.createVente = async (req, res) => {
     if (!centreExists) {
       return res.status(404).send({ message: "centre not found" });
     }
-console.log(quantite);
+    console.log(quantite);
     // Check if the client exists
     const clienttExists = await Client.findOne({ code: client });
     if (!clienttExists) {
@@ -46,8 +45,29 @@ console.log(quantite);
 // Get all sales
 exports.getAllVente = async (req, res) => {
   try {
+    // Fetch all ventes
     const ventes = await Ventes.find();
-    res.status(200).json(ventes);
+
+    // Fetch all clients and products and create lookup objects
+    const clients = await Client.find();
+    const produits = await Product.find();
+    const clientLookup = clients.reduce((acc, client) => {
+      acc[client.code] = client.nom; // Replace 'nom' with the actual field name for the client's name
+      return acc;
+    }, {});
+    const produitLookup = produits.reduce((acc, produit) => {
+      acc[produit.code] = produit.name; // Replace 'nom' with the actual field name for the product's name
+      return acc;
+    }, {});
+
+    // Combine ventes with client and product names
+    const ventesWithDetails = ventes.map((vente) => ({
+      ...vente.toObject(),
+      clientNom: clientLookup[vente.client],
+      produitNom: produitLookup[vente.produit],
+    }));
+
+    res.status(200).json(ventesWithDetails);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
