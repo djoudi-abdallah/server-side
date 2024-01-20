@@ -29,7 +29,7 @@ exports.createTrasnsfer = async (req, res) => {
 // Get all transfers
 exports.getAlltransfer = async (req, res) => {
   try {
-    const transferts = await Transferts.find();
+    const transferts = await Transferts.find({centre:req.params.id});
     res.status(200).json(transferts);
   } catch (error) {
     res.status(500).json({ error: error.message });

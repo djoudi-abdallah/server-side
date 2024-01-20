@@ -16,7 +16,7 @@ exports.createEmploye = async (req, res) => {
 // Get all employes with additional details
 exports.getAllemploye = async (req, res) => {
   try {
-    let employes = await Employe.find();
+    let employes = await Employe.find({centre:req.params.id});
     employes = await Promise.all(
       employes.map(async (employe) => {
         employe = employe.toObject(); // Convert Mongoose document to a plain JavaScript object

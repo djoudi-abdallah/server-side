@@ -6,9 +6,9 @@ const employecontroller=require("../controllers/EmployeController")
 router.post("/employes",employecontroller.createEmploye)
 
 // Get all employes with additional details
-router.get("/employes", employecontroller.getAllemploye)
+router.get("/employes/:id", employecontroller.getAllemploye)
 // Read a Single Employé by ID
-router.get("/employes/:id", employecontroller.getEmploye)
+router.get("/employe/:id", employecontroller.getEmploye)
 // Update an Employé by ID
 router.put("/employes/:id", employecontroller.updateEmploye)
 // Delete an Employé by ID
