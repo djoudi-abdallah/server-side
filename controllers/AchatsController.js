@@ -130,6 +130,7 @@ exports.getAllAchats = async (req, res) => {
         achat.productDetails = product; // Add product details to achat
 
         return achat;
+        
       })
     );  
     // await Achat.deleteMany({})

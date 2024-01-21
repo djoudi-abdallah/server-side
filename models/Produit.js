@@ -5,7 +5,7 @@ const produitSchema = new mongoose.Schema({
   code: { type: Number, index: true, unique: true },
   name: { type: String, required: true },
   status: { type: String, default: "premier" },
-  price: Number,
+  price: { type: Number, required: true },
 });
 produitSchema.pre("save", async function (next) {
   if (this.isNew) {
