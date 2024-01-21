@@ -1,14 +1,14 @@
 const Reglements = require("../models/ReglementFournisseur");
-const centre = require("../models/Centre");
+const Centre = require("../models/Centre");
 const Fournisseur = require("../models/Fournisseur");
 
 // Create a new payment
-exports.createreglementfou= async (req, res) => {
-  const { centreID, fournisseur} = req.body;
+exports.createreglementfou = async (req, res) => {
+  const { centre, fournisseur } = req.body;
   try {
     // Check if the centre exists
-    const centreExists = await centre.findOne({
-      code: centreID,
+    const centreExists = await Centre.findOne({
+      code: centre,
     });
     if (!centreExists) {
       return res.status(404).send({ message: "centre not found" });
@@ -19,7 +19,6 @@ exports.createreglementfou= async (req, res) => {
     if (!fournisseurExists) {
       return res.status(404).send({ message: "fournisseur not found" });
     }
-    
 
     const newReglement = await Reglements.create(req.body);
     res.status(201).json(newReglement);
@@ -29,7 +28,7 @@ exports.createreglementfou= async (req, res) => {
 };
 
 // Get all payments
-exports.getAllreglement=async (req, res) => {
+exports.getAllreglement = async (req, res) => {
   try {
     const reglements = await Reglements.find();
     res.status(200).json(reglements);
@@ -39,7 +38,7 @@ exports.getAllreglement=async (req, res) => {
 };
 
 // Get a specific payment by ID
-exports.getReglement= async (req, res) => {
+exports.getReglement = async (req, res) => {
   try {
     const reglement = await Reglements.findOne({ code: req.params.id });
     if (!reglement) {
@@ -52,7 +51,7 @@ exports.getReglement= async (req, res) => {
 };
 
 // Update a specific payment by ID
-exports.updatereglement= async (req, res) => {
+exports.updatereglement = async (req, res) => {
   try {
     const updatedReglement = await Reglements.findOneAndUpdate(
       { code: req.params.id },
@@ -69,7 +68,7 @@ exports.updatereglement= async (req, res) => {
 };
 
 // Delete a specific payment by ID
-exports.deleteREglement= async (req, res) => {
+exports.deleteREglement = async (req, res) => {
   try {
     const deletedReglement = await Reglements.findOneAndDelete({
       code: req.params.id,
@@ -82,5 +81,3 @@ exports.deleteREglement= async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-

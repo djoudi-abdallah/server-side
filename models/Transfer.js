@@ -25,7 +25,7 @@ const TransfertsSchema = new mongoose.Schema({
   },
   coutEquivalent: {
     type: Number,
-    required: true,
+    default: 0,
   },
 });
 

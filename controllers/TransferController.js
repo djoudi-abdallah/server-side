@@ -2,9 +2,11 @@ const Transferts = require("../models/Transfer");
 const Product = require("../models/Produit");
 const Centre = require("../models/Centre");
 const ProduitStock = require("../models/produitStock");
+const Achats = require("../models/Achats");
 // Create a new transfer
 exports.createTrasnsfer = async (req, res) => {
   const { centre, id_produit, quantite } = req.body;
+  let coutEquivalent = 0;
   try {
     // Check if the centre exists
     const centreExists = await Centre.findOne({
@@ -18,6 +20,14 @@ exports.createTrasnsfer = async (req, res) => {
     const productExists = await Product.findOne({ code: id_produit });
     if (!productExists) {
       return res.status(404).send({ message: "Product not found" });
+    }
+
+    const achatsDetails = await Achats.findOne({ id_produit: id_produit });
+
+    console.log("achatsDetails:", achatsDetails); // Debugging log
+
+    if (achatsDetails && achatsDetails.prixUnitaireHT) {
+      coutEquivalent = quantite * achatsDetails.prixUnitaireHT;
     }
 
     const produitStockEntry = await ProduitStock.findOne({
@@ -34,7 +44,12 @@ exports.createTrasnsfer = async (req, res) => {
       });
       await newProduitStockEntry.save();
     }
-    const newTransfert = await Transferts.create(req.body);
+    const response = {
+      ...req.body,
+      coutEquivalent: coutEquivalent, // assuming this line is correct
+    };
+
+    const newTransfert = await Transferts.create(response);
     res.status(201).json(newTransfert);
   } catch (error) {
     console.log(error);
@@ -82,14 +97,35 @@ exports.gettransfer = async (req, res) => {
 // Update a specific transfer by ID
 exports.updatetransfer = async (req, res) => {
   try {
+    // Find the existing transfer document to get the product ID
+    const existingTransfer = await Transferts.findOne({ code: req.params.id });
+
+    if (!existingTransfer) {
+      return res.status(404).json({ message: "Transfer not found" });
+    }
+
+    // Update the transfer document with the new data
     const updatedTransfert = await Transferts.findOneAndUpdate(
       { code: req.params.id },
       req.body,
       { new: true }
     );
-    if (!updatedTransfert) {
-      return res.status(404).json({ message: "Transfer not found" });
+
+    // Calculate the updated coutEquivalent based on the new quantite
+    const achatsDetails = await Achats.findOne({
+      id_produit: existingTransfer.id_produit,
+    });
+    if (achatsDetails && achatsDetails.prixUnitaireHT) {
+      updatedTransfert.coutEquivalent =
+        updatedTransfert.quantite * achatsDetails.prixUnitaireHT;
+    } else {
+      // Handle the case where achatsDetails or prixUnitaireHT is missing
+      updatedTransfert.coutEquivalent = 0; // You can set it to a default value or handle it as needed
     }
+
+    // Save the updated transfer document with the recalculated coutEquivalent
+    await updatedTransfert.save();
+
     res.status(200).json(updatedTransfert);
   } catch (error) {
     res.status(500).json({ error: error.message });
