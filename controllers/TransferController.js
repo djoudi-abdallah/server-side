@@ -1,10 +1,10 @@
 const Transferts = require("../models/Transfer");
 const Product = require("../models/Produit");
 const Centre = require("../models/Centre");
-
+const ProduitStock = require("../models/produitStock");
 // Create a new transfer
 exports.createTrasnsfer = async (req, res) => {
-  const { centre, id_produit } = req.body;
+  const { centre, id_produit, quantite } = req.body;
   try {
     // Check if the centre exists
     const centreExists = await Centre.findOne({
@@ -37,6 +37,7 @@ exports.createTrasnsfer = async (req, res) => {
     const newTransfert = await Transferts.create(req.body);
     res.status(201).json(newTransfert);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -45,7 +46,21 @@ exports.createTrasnsfer = async (req, res) => {
 exports.getAlltransfer = async (req, res) => {
   try {
     const transferts = await Transferts.find({ centre: req.params.id });
-    res.status(200).json(transferts);
+
+    // Fetch product details for each transfer
+    const transfersWithProductDetails = await Promise.all(
+      transferts.map(async (transfer) => {
+        // Fetch product details for the transfer
+        const product = await Product.findOne({
+          code: transfer.id_produit,
+        }).select("name status price ");
+        transfer.productDetails = product;
+
+        return transfer;
+      })
+    );
+
+    res.status(200).json(transfersWithProductDetails);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

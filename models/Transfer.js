@@ -8,7 +8,7 @@ const TransfertsSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  
+
   centre: {
     type: Number,
     ref: "Centre",
@@ -33,11 +33,11 @@ TransfertsSchema.pre("save", async function (next) {
   if (this.isNew) {
     try {
       const counterDoc = await CounterTransfer.findByIdAndUpdate(
-        { _id: "id_transfer" },
+        { _id: "code" },
         { $inc: { seq: 1 } },
         { new: true, upsert: true }
       );
-      this.id_transfer = counterDoc.seq;
+      this.code = counterDoc.seq;
       // Continue with the rest of the pre-save logic...
     } catch (err) {
       return next(err);
