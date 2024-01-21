@@ -86,6 +86,36 @@ exports.getAlltransfer = async (req, res) => {
   }
 };
 
+// Get all transfers from all centers
+exports.getAllTransfers1 = async (req, res) => {
+  try {
+    // Fetch all transfers from the Transferts collection
+    const transfers = await Transferts.find();
+
+    // Fetch product details for each transfer
+    const transfersWithProductDetails = await Promise.all(
+      transfers.map(async (transfer) => {
+        // Fetch product details for the transfer
+        const product = await Product.findOne({
+          code: transfer.id_produit,
+        }).select("name status price");
+
+        // Clone the transfer object and add productDetails
+        const transferWithDetails = transfer.toObject
+          ? transfer.toObject()
+          : { ...transfer._doc };
+        transferWithDetails.productDetails = product;
+
+        return transferWithDetails;
+      })
+    );
+
+    res.status(200).json(transfersWithProductDetails);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Get a specific transfer by ID
 exports.gettransfer = async (req, res) => {
   try {

@@ -8,6 +8,7 @@ router.post("/transferts", Transfertcontroller.createTrasnsfer);
 // Get all transfers
 router.get("/transfertsShop/:id", Transfertcontroller.getAlltransfer);
 
+router.get("/transferts", Transfertcontroller.getAllTransfers1);
 // Get a specific transfer by ID
 router.get("/transferts/:id", Transfertcontroller.gettransfer);
 
