@@ -3,6 +3,7 @@ const Fournisseur = require("../models/Fournisseur");
 const Product = require("../models/Produit");
 const ProduitStock = require("../models/produitStock");
 const Centre = require("../models/Centre");
+const Achats = require("../models/Achats");
 
 exports.createAchat = async (req, res) => {
   const {
@@ -130,8 +131,8 @@ exports.getAllAchats = async (req, res) => {
 
         return achat;
       })
-    );
-
+    );  
+    // await Achat.deleteMany({})
     res.status(200).send(achats);
   } catch (error) {
     console.log(error);

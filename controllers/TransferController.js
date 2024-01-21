@@ -68,10 +68,15 @@ exports.getAlltransfer = async (req, res) => {
         // Fetch product details for the transfer
         const product = await Product.findOne({
           code: transfer.id_produit,
-        }).select("name status price ");
-        transfer.productDetails = product;
+        }).select("name status price");
 
-        return transfer;
+        // Clone the transfer object and add productDetails
+        const transferWithDetails = transfer.toObject
+          ? transfer.toObject()
+          : { ...transfer._doc };
+        transferWithDetails.productDetails = product;
+
+        return transferWithDetails;
       })
     );
 
