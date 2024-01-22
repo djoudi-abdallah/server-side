@@ -24,7 +24,9 @@ exports.createVente = async (req, res) => {
       return res.status(404).send({ message: "client not found" });
     }
     // Check if the Product exists on the stock
-    const stockExists = await ProduitStock.findOne({ produit: produit });
+    const stockExists = await ProduitStock.findOne({
+      produit: parseInt(produit),
+    });
     if (!stockExists) {
       return res.status(404).send({ message: "Product not found" });
     }
@@ -46,7 +48,7 @@ exports.createVente = async (req, res) => {
 exports.getAllVente = async (req, res) => {
   try {
     // Fetch all ventes
-    const ventes = await Ventes.find({centre:req.params.id});
+    const ventes = await Ventes.find({ centre: req.params.id });
 
     // Fetch all clients and products and create lookup objects
     const clients = await Client.find();
@@ -56,7 +58,7 @@ exports.getAllVente = async (req, res) => {
       return acc;
     }, {});
     const produitLookup = produits.reduce((acc, produit) => {
-      acc[produit.code] = produit.name; 
+      acc[produit.code] = produit.name;
       return acc;
     }, {});
 

@@ -3,7 +3,7 @@ const Employe = require("../models/Employe");
 const Absence = require("../models/Absence");
 
 // Create a new Monthly Salary entry
-exports.createsalaries= async (req, res) => {
+exports.createsalaries = async (req, res) => {
   const { employeId } = req.body;
   try {
     let employeExists = await Employe.findOne({ code: employe });
@@ -26,7 +26,7 @@ exports.createsalaries= async (req, res) => {
 };
 
 // Get all Monthly Salary entries
-exports.getAllsalaries= async (req, res) => {
+exports.getAllsalaries = async (req, res) => {
   try {
     const monthlySalaries = await MonthlySalary.find();
     res.status(200).json(monthlySalaries);
@@ -36,7 +36,7 @@ exports.getAllsalaries= async (req, res) => {
 };
 
 // Get a specific Monthly Salary entry by ID
-exports.getsalaries= async (req, res) => {
+exports.getsalaries = async (req, res) => {
   try {
     const monthlySalary = await MonthlySalary.findOne({ code: req.params.id });
     if (!monthlySalary) {
@@ -51,7 +51,7 @@ exports.getsalaries= async (req, res) => {
 };
 
 // Update a specific Monthly Salary entry by ID
-exports.updatesaalries= async (req, res) => {
+exports.updatesaalries = async (req, res) => {
   try {
     const updatedMonthlySalary = await MonthlySalary.findOneAndUpdate(
       { code: req.params.id },
@@ -70,7 +70,7 @@ exports.updatesaalries= async (req, res) => {
 };
 
 // Delete a specific Monthly Salary entry by ID
-exports.deletesalaries= async (req, res) => {
+exports.deletesalaries = async (req, res) => {
   try {
     const deletedMonthlySalary = await MonthlySalary.findOneAndDelete({
       code: req.params.id,

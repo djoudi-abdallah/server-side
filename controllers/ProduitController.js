@@ -64,9 +64,13 @@ exports.getproduit = async (req, res) => {
 
 exports.updateproduit = async (req, res) => {
   try {
-    const produit = await Produit.findOne({ code: req.params.id }, req.body, {
-      new: true,
-    });
+    const produit = await Produit.findOneAndUpdate(
+      { code: req.params.id },
+      req.body,
+      {
+        new: true,
+      }
+    );
     if (!produit) {
       return res.status(404).send({ message: "Produit not found" });
     }
