@@ -4,18 +4,18 @@ const Absence = require("../models/Absence");
 
 // Create a new Monthly Salary entry
 exports.createsalaries = async (req, res) => {
-  const { employeId } = req.body;
+  const { employe } = req.body;
   try {
     let employeExists = await Employe.findOne({ code: employe });
     if (!employeExists) {
       return res.status(404).send({ message: "Employé not  found " });
     }
     const count = await Absence.countDocuments({
-      employe: employeId,
+      employe: employe,
     }); //count the days of absence
     salarym = employeExists.salaire_jour * (26 - count); //26 cause of the days of works (Samedi-jeudi)
     const newMonthlySalary = await MonthlySalary.create(
-      { employeeID: employeId },
+      { employeid: employe },
       { salary: salarym }
     );
 

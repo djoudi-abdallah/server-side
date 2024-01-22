@@ -3,15 +3,15 @@ const employe = require("./Employe");
 const CounterMonthlySalaries = require("./counters/monthlysalariescounter");
 const MonthlySalarySchema = new mongoose.Schema({
   code: { type: Number, unique: true, index: true },
-  employeeID: {
+  employeid: {
     type: Number,
-    ref: "Employee", // Create Employee model similarly
+    ref: "Employe", // Create Employee model similarly
     required: true,
   },
   date: { type: Date, default: Date.now },
   salary: {
     type: Number,
-    required: true,
+    default: 0,
   },
 });
 MonthlySalarySchema.pre("save", async function (next) {

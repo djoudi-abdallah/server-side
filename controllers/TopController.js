@@ -77,7 +77,7 @@ exports.getCentreOverview = async (req, res) => {
 
 exports.getCentreOverviewForCentre1 = async (req, res) => {
   try {
-    const centreFilter = { centre: 3 };
+    const centreFilter = { centre: 1 };
 
     // Top Client
     const topClientResult = await Sales.aggregate([
