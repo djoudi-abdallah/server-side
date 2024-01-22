@@ -3,7 +3,7 @@ const CounterMasrouf = require("./counters/masroufcounter");
 
 const MassroufSchema = new mongoose.Schema({
   code: { type: Number, index: true, unique: true },
-  employeeID: {
+  employe: {
     type: Number,
     ref: "Employee", // Create Employee model similarly
     required: true,

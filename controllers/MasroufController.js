@@ -6,16 +6,18 @@ const MonthlySalary = require("../models/MonthlySalaries");
 exports.createMasrouf = async (req, res) => {
   const { employe } = req.body;
   const { amount } = req.body;
+  console.log(employe);
   try {
     let employeExists = await Employe.findOne({ code: employe });
     if (!employeExists) {
       return res.status(404).send({ message: "Employé not found " });
     }
-    let salarym = MonthlySalary.findOne({ employeeID: employe });
+    let salarym = MonthlySalary.findOne({ employe: employe });
     salarym.salary -= amount;
     const newMassrouf = await Massrouf.create(req.body);
     res.status(201).json(newMassrouf);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };

@@ -1,9 +1,8 @@
 const mongoose = require("mongoose");
-const employe = require("./Employe");
 const CounterMonthlySalaries = require("./counters/monthlysalariescounter");
 const MonthlySalarySchema = new mongoose.Schema({
   code: { type: Number, unique: true, index: true },
-  employeid: {
+  employeID: {
     type: Number,
     ref: "Employe", // Create Employee model similarly
     required: true,
