@@ -111,3 +111,17 @@ exports.getTopProducts = async (req, res) => {
     res.status(500).send(error);
   }
 };
+
+exports.mostrecentlyvendu = async (req, res) => {
+  const centreId = parseInt(req.params.centreId); // Assuming centre IDs are integers
+
+  try {
+    const recentSales = await Vente.find({ centre: centreId })
+      .sort({ dateVente: -1 }) // Sort by dateVente in descending order
+      .limit(10); // Adjust the limit as per your requirement
+
+    res.json(recentSales);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
