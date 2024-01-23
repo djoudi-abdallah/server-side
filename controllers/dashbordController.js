@@ -2,6 +2,7 @@ const Vente = require("../models/Vente");
 const achat = require("../models/Achats");
 const Produit = require("../models/Produit");
 const Client = require("../models/client");
+const Transferts = require("../models/Transfer");
 
 exports.getcircle = async (req, res) => {
   try {
@@ -143,5 +144,66 @@ exports.mostrecentlyvendu = async (req, res) => {
     res.json(enrichedSales);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getprofit = async (req, res) => {
+  try {
+    // Aggregate total sales per centre per year
+    const salesResult = await Vente.aggregate([
+      {
+        $group: {
+          _id: {
+            centre: "$centre",
+            year: { $year: "$dateVente" },
+          },
+          totalSales: { $sum: "$montantTotal" },
+        },
+      },
+    ]);
+
+    // Aggregate total transfer costs per centre per year
+    const transferResult = await Transferts.aggregate([
+      {
+        $group: {
+          _id: {
+            centre: "$centre",
+            year: { $year: "$dateTransfert" },
+          },
+          totalTransferCost: { $sum: "$coutEquivalent" },
+        },
+      },
+    ]);
+
+    // Combine the results to calculate profit
+    let profits = {};
+
+    salesResult.forEach((sale) => {
+      const key = `${sale._id.centre}-${sale._id.year}`;
+      profits[key] = {
+        revenue: sale.totalSales,
+        transferCosts: 0,
+        profit: sale.totalSales,
+      };
+    });
+
+    transferResult.forEach((transfer) => {
+      const key = `${transfer._id.centre}-${transfer._id.year}`;
+      if (profits[key]) {
+        profits[key].transferCosts = transfer.totalTransferCost;
+        profits[key].profit -= transfer.totalTransferCost;
+      } else {
+        profits[key] = {
+          revenue: 0,
+          transferCosts: transfer.totalTransferCost,
+          profit: -transfer.totalTransferCost,
+        };
+      }
+    });
+
+    res.status(200).json(profits);
+  } catch (error) {
+    console.error("Error calculating annual profit per centre:", error);
+    res.status(500).send("Internal Server Error");
   }
 };
