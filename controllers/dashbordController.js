@@ -1,5 +1,7 @@
 const Vente = require("../models/Vente");
 const achat = require("../models/Achats");
+const Produit = require("../models/Produit");
+const Client = require("../models/client");
 
 exports.getcircle = async (req, res) => {
   try {
@@ -8,7 +10,7 @@ exports.getcircle = async (req, res) => {
       {
         $group: {
           _id: "$centre", // Group by the "centre" field in your Vente schema
-          totalSales: { $sum: "$montantTotal" }, // Replace 'montantTotal' with your field for sales amount
+          totalSales: { $sum: "$montantTotal" },
         },
       },
       {
@@ -113,14 +115,32 @@ exports.getTopProducts = async (req, res) => {
 };
 
 exports.mostrecentlyvendu = async (req, res) => {
-  const centreId = parseInt(req.params.centreId); // Assuming centre IDs are integers
-
   try {
-    const recentSales = await Vente.find({ centre: centreId })
-      .sort({ dateVente: -1 }) // Sort by dateVente in descending order
-      .limit(10); // Adjust the limit as per your requirement
+    // Récupération des ventes récentes
+    const recentSales = await Vente.find({ centre: 1 })
+      .sort({ dateVente: -1 })
+      .limit(10);
 
-    res.json(recentSales);
+    // Préparation des promesses pour récupérer les détails des produits et des clients
+    const produitPromises = recentSales.map((vente) =>
+      Produit.findOne({ code: vente.produit }).select("name")
+    );
+    const clientPromises = recentSales.map((vente) =>
+      Client.findOne({ code: vente.client }).select("nom")
+    );
+
+    // Résolution des promesses
+    const produitsDetails = await Promise.all(produitPromises);
+    const clientsDetails = await Promise.all(clientPromises);
+
+    // Attacher les détails aux ventes correspondantes
+    const enrichedSales = recentSales.map((vente, index) => ({
+      ...vente.toObject(),
+      produitDetails: produitsDetails[index],
+      clientDetails: clientsDetails[index],
+    }));
+
+    res.json(enrichedSales);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
