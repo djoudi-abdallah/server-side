@@ -6,6 +6,7 @@ const Employe = require("../models/Employe");
 const Fournisseur = require("../models/Fournisseur");
 const Centre = require("../models/Centre");
 const monthlySalary = require("../models/MonthlySalaries");
+const Achats = require("../models/Achats");
 
 exports.getCentreOverview = async (req, res) => {
   try {
@@ -21,7 +22,6 @@ exports.getCentreOverview = async (req, res) => {
       { $sort: { totalValue: -1 } },
       { $limit: 1 },
     ]);
-    console.log(topClientResult);
     const topClientId = topClientResult[0]?._id;
     const topClientDetails = topClientId
       ? await Clients.findOne({ code: topClientId })
@@ -89,7 +89,7 @@ exports.getCentreOverviewForCentre1 = async (req, res) => {
     ]);
     const topClientId = topClientResult[0]?._id;
     const topClientDetails = topClientId
-      ? await Clients.findOne({ _id: topClientId })
+      ? await Clients.findOne({ code: topClientId })
       : null;
 
     // Top Supplier (Fournisseur)
@@ -177,7 +177,6 @@ exports.getTopSalesDetails = async (req, res) => {
         salaire: topEmployeeResult[0].highestSalary,
       });
     }
-    
 
     // Exclude centre with code 1 and Aggregate top product based on sales quantity
     const topProduct = await Sales.aggregate([
