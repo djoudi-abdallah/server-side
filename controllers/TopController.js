@@ -5,6 +5,7 @@ const Transfers = require("../models/Transfer");
 const Employe = require("../models/Employe");
 const Fournisseur = require("../models/Fournisseur");
 const Centre = require("../models/Centre");
+const monthlySalary = require("../models/MonthlySalaries");
 
 exports.getCentreOverview = async (req, res) => {
   try {
@@ -117,7 +118,7 @@ exports.getCentreOverviewForCentre1 = async (req, res) => {
     let topEmployeeDetails = null;
     if (topEmployeeResult.length > 0 && topEmployeeResult[0].highestSalary) {
       topEmployeeDetails = await Employe.findOne({
-        centre: 3,
+        centre: 1,
         salaire: topEmployeeResult[0].highestSalary,
       });
     }
@@ -172,13 +173,15 @@ exports.getTopSalesDetails = async (req, res) => {
     let topEmployeeDetails = null;
     if (topEmployeeResult.length > 0 && topEmployeeResult[0].highestSalary) {
       topEmployeeDetails = await Employe.findOne({
-        centre: 3,
+        centre: centreId,
         salaire: topEmployeeResult[0].highestSalary,
       });
     }
+    
+
     // Exclude centre with code 1 and Aggregate top product based on sales quantity
     const topProduct = await Sales.aggregate([
-      { $match: centreFilter},
+      { $match: centreFilter },
       { $group: { _id: "$produit", totalQuantity: { $sum: "$quantite" } } },
       { $sort: { totalQuantity: -1 } },
       { $limit: 1 },

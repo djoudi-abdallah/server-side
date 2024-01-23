@@ -13,7 +13,8 @@ exports.createMasrouf = async (req, res) => {
       return res.status(404).send({ message: "Employé not found " });
     }
     let salarym = MonthlySalary.findOne({ employe: employe });
-    salarym.salary -= amount;
+    salarym.salary = salarym.salary - amount;
+    employeExists.salaire = employeExists.salaire - amount;
     const newMassrouf = await Massrouf.create(req.body);
     res.status(201).json(newMassrouf);
   } catch (error) {
@@ -35,7 +36,7 @@ exports.getAllmasrouf = async (req, res) => {
           code: massrouf.employe,
         }).select("nom"); // Select only the 'nom' field from the Employee model
         massrouf.employeeDetails = employee;
-         
+
         return massrouf;
       })
     );

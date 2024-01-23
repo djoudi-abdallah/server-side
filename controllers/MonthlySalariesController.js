@@ -15,6 +15,7 @@ exports.createsalaries = async (req, res) => {
       employe: employeId,
     }); //count the days of absence
     salarym = employeExists.salaire_jour * (26 - count); //26 cause of the days of works (Samedi-jeudi)
+    employeExists.salaire = salarym;
     const newMonthlySalary = await MonthlySalary.create({
       employeID: employeId,
       salary: salarym,
@@ -29,9 +30,30 @@ exports.createsalaries = async (req, res) => {
 // Get all Monthly Salary entries
 exports.getAllsalaries = async (req, res) => {
   try {
-    const monthlySalaries = await MonthlySalary.find();
+    let monthlySalaries = await MonthlySalary.find();
+    monthlySalaries = await Promise.all(
+      monthlySalaries.map(async (monthlySalary) => {
+        const monthlySalaryObj = monthlySalary.toObject(); // Convert to a plain JavaScript object
+
+        // Fetch employee details
+        const employee = await Employe.findOne({
+          code: monthlySalaryObj.employeID,
+        }).select("nom"); // Select only the 'nom' field from the Employee model
+
+        // Check if an employee was found and assign details accordingly
+        if (employee) {
+          monthlySalaryObj.employeeDetails = { nom: employee.nom };
+        } else {
+          monthlySalaryObj.employeeDetails = null;
+        }
+
+        return monthlySalaryObj;
+      })
+    );
+
     res.status(200).json(monthlySalaries);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: error.message });
   }
 };
