@@ -23,6 +23,16 @@ exports.getAllemploye = async (req, res) => {
   }
 };
 
+exports.getemployes = async (req, res) => {
+  try {
+    const employes = await Employe.find();
+
+    res.status(200).send(employes);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};
+
 // Read a Single Employé by ID
 exports.getEmploye = async (req, res) => {
   try {
