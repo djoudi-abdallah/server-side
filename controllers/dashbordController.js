@@ -158,61 +158,69 @@ exports.mostrecentlyvendu = async (req, res) => {
 
 exports.getprofit = async (req, res) => {
   try {
-    // Aggregate total sales per centre per year
+    const centreId = parseInt(req.params.id);
+    const currentYear = new Date().getFullYear();
+
+    if (isNaN(centreId)) {
+      return res.status(400).send("Invalid Centre ID");
+    }
+
+    // Filter and Aggregate total sales for the specified centre for each month of the current year
     const salesResult = await Vente.aggregate([
-      {
+      { 
+        $match: { 
+          centre: centreId,
+          dateVente: { 
+            $gte: new Date(`${currentYear}-01-01`),
+            $lte: new Date(`${currentYear}-12-31`)
+          }
+        } 
+      },
+      { 
         $group: {
-          _id: {
-            centre: "$centre",
-            year: { $year: "$dateVente" },
-          },
-          totalSales: { $sum: "$montantTotal" },
-        },
+          _id: { $month: "$dateVente" },
+          totalSales: { $sum: "$montantTotal" }
+        }
       },
     ]);
 
-    // Aggregate total transfer costs per centre per year
+    // Filter and Aggregate total transfer costs for the specified centre for each month of the current year
     const transferResult = await Transferts.aggregate([
-      {
+      { 
+        $match: { 
+          centre: centreId,
+          dateTransfert: { 
+            $gte: new Date(`${currentYear}-01-01`),
+            $lte: new Date(`${currentYear}-12-31`)
+          } 
+        } 
+      },
+      { 
         $group: {
-          _id: {
-            centre: "$centre",
-            year: { $year: "$dateTransfert" },
-          },
-          totalTransferCost: { $sum: "$coutEquivalent" },
-        },
+          _id: { $month: "$dateTransfert" },
+          totalTransferCost: { $sum: "$coutEquivalent" }
+        }
       },
     ]);
 
-    // Combine the results to calculate profit
-    let profits = {};
+    // Initialize an array for each month of the year
+    let monthlyProfits = new Array(12).fill(0);
 
+    // Add sales to the profits
     salesResult.forEach((sale) => {
-      const key = `${sale._id.centre}-${sale._id.year}`;
-      profits[key] = {
-        revenue: sale.totalSales,
-        transferCosts: 0,
-        profit: sale.totalSales,
-      };
+      monthlyProfits[sale._id - 1] += sale.totalSales;
     });
 
+    // Subtract transfer costs from the profits
     transferResult.forEach((transfer) => {
-      const key = `${transfer._id.centre}-${transfer._id.year}`;
-      if (profits[key]) {
-        profits[key].transferCosts = transfer.totalTransferCost;
-        profits[key].profit -= transfer.totalTransferCost;
-      } else {
-        profits[key] = {
-          revenue: 0,
-          transferCosts: transfer.totalTransferCost,
-          profit: -transfer.totalTransferCost,
-        };
-      }
+      monthlyProfits[transfer._id - 1] -= transfer.totalTransferCost;
     });
 
-    res.status(200).json(profits);
+    res.status(200).json(monthlyProfits);
   } catch (error) {
-    console.error("Error calculating annual profit per centre:", error);
+    console.error("Error calculating monthly profit for centre:", error);
     res.status(500).send("Internal Server Error");
   }
 };
+
+
