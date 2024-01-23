@@ -25,9 +25,24 @@ exports.createMasrouf = async (req, res) => {
 // Get all Massrouf entries
 exports.getAllmasrouf = async (req, res) => {
   try {
-    const massroufs = await Massrouf.find();
+    let massroufs = await Massrouf.find();
+    massroufs = await Promise.all(
+      massroufs.map(async (massrouf) => {
+        massrouf = massrouf.toObject(); // Convert Mongoose document to a plain JavaScript object
+
+        // Fetch employee details
+        const employee = await Employe.findOne({
+          code: massrouf.employe,
+        }).select("nom"); // Select only the 'nom' field from the Employee model
+        massrouf.employeeDetails = employee;
+         
+        return massrouf;
+      })
+    );
+
     res.status(200).json(massroufs);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: error.message });
   }
 };
