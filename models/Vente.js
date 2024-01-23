@@ -40,7 +40,7 @@ const VentesSchema = new mongoose.Schema({
   },
   montantEncaisse: {
     type: Number,
-    default: 0,
+    required: true,
   },
   status: {
     type: String,

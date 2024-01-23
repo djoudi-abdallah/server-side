@@ -8,7 +8,8 @@ const Product = require("../models/Produit");
 
 // Create a new sale
 exports.createVente = async (req, res) => {
-  const { centre, client, produit, quantite } = req.body;
+  const { centre, client, produit, quantite, status, montantEncaisse } =
+    req.body;
   try {
     // Check if the centre exists
     const centreExists = await Centre.findOne({
@@ -17,7 +18,7 @@ exports.createVente = async (req, res) => {
     if (!centreExists) {
       return res.status(404).send({ message: "centre not found" });
     }
-    console.log(quantite);
+
     // Check if the client exists
     const clienttExists = await Client.findOne({ code: client });
     if (!clienttExists) {
@@ -36,6 +37,9 @@ exports.createVente = async (req, res) => {
       return res
         .status(404)
         .send({ message: "the quantite of this product not enaughe" });
+    }
+    if (status === "Partiellement payé") {
+      clienttExists.credit = this.montantTotal - montantEncaisse;
     }
     const newVente = await Ventes.create(req.body);
     res.status(201).json(newVente);
