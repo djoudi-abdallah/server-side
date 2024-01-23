@@ -40,6 +40,7 @@ exports.createVente = async (req, res) => {
     }
     if (status === "Partiellement payé") {
       clienttExists.credit = this.montantTotal - montantEncaisse;
+      clienttExists.save();
     }
     const newVente = await Ventes.create(req.body);
     res.status(201).json(newVente);
