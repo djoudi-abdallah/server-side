@@ -5,7 +5,6 @@ const Transfers = require("../models/Transfer");
 const Employe = require("../models/Employe");
 const Fournisseur = require("../models/Fournisseur");
 const Centre = require("../models/Centre");
-const monthlySalary = require("../models/MonthlySalaries");
 const Achats = require("../models/Achats");
 
 exports.getCentreOverview = async (req, res) => {
@@ -98,7 +97,7 @@ exports.getCentreOverviewForCentre1 = async (req, res) => {
       {
         $group: {
           _id: "$id_fournisseur",
-          totalPurchaseValue: { $sum: "$montantTotal" },
+          totalPurchaseValue: { $sum: "$montantTotalHT" },
         },
       },
       { $sort: { totalPurchaseValue: -1 } },
@@ -141,7 +140,6 @@ exports.getCentreOverviewForCentre1 = async (req, res) => {
       topProduct: topProductDetails,
     });
   } catch (error) {
-    console.error(error);
     res.status(500).send({ message: "Internal Server Error" });
   }
 };

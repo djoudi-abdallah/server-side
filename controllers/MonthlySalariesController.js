@@ -11,11 +11,27 @@ exports.createsalaries = async (req, res) => {
     if (!employeExists) {
       return res.status(404).send({ message: "Employé not  found " });
     }
+    const startDateOfMonth = new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      1
+    );
+    const endDateOfMonth = new Date(
+      new Date().getFullYear(),
+      new Date().getMonth() + 1,
+      0
+    );
+
     const count = await Absence.countDocuments({
       employe: employeId,
+      date: {
+        $gte: startDateOfMonth,
+        $lte: endDateOfMonth,
+      },
     }); //count the days of absence
     salarym = employeExists.salaire_jour * (26 - count); //26 cause of the days of works (Samedi-jeudi)
     employeExists.salaire = salarym;
+    employeExists.save();
     const newMonthlySalary = await MonthlySalary.create({
       employeID: employeId,
       salary: salarym,

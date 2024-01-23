@@ -14,7 +14,6 @@ exports.createAchat = async (req, res) => {
     centre,
     prixUnitaireHT,
   } = req.body;
-  console.log(id_fournisseur);
   try {
     // Check if the Fournisseur exists
     const fournisseurExists = await Fournisseur.findOne({
@@ -40,7 +39,7 @@ exports.createAchat = async (req, res) => {
     if (statusPaiement === "Partiellement payé") {
       fournisseurExists.solde += soldeRestant;
     }
-    console.log(fournisseurExists);
+
     // Create the Achat
     const newAchat = new Achat({
       id_fournisseur,
@@ -134,7 +133,6 @@ exports.getAllAchats = async (req, res) => {
     // await Achat.deleteMany({})
     res.status(200).send(achats);
   } catch (error) {
-    console.log(error);
     res.status(500).send(error);
   }
 };
