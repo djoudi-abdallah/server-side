@@ -75,7 +75,16 @@ exports.getTotalPurchaseByMonth = async (req, res) => {
       },
     ]);
 
-    res.json(salesData);
+    // Initialize an array of 12 zeros (one for each month)
+    let monthlyPurchases = new Array(12).fill(0);
+
+    // Update the array with actual sales data
+    salesData.forEach((item) => {
+      const month = parseInt(item._id.split("-")[1]) - 1; // Extract month (0-11)
+      monthlyPurchases[month] = item.totalPurchase;
+    });
+
+    res.json(monthlyPurchases);
   } catch (error) {
     res.status(500).send(error);
   }
