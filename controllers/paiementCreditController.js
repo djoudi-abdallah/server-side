@@ -4,7 +4,7 @@ const centre = require("../models/Centre");
 
 // Create a new Paiement Credit entry
 exports.createPaiement = async (req, res) => {
-  const { centreID, clientID } = req.body;
+  const { centreID, clientID, amountPaid } = req.body;
   try {
     // Check if the centre exists
     const centreExists = await centre.findOne({
@@ -19,7 +19,10 @@ exports.createPaiement = async (req, res) => {
     if (!clienttExists) {
       return res.status(404).send({ message: "client not found" });
     }
-
+    if (clienttExists.credit !== 0) {
+      clienttExists.credit -= amountPaid;
+    }
+    clienttExists.save();
     const newPaiementCredit = await PaiementCredit.create(req.body);
     res.status(201).json(newPaiementCredit);
   } catch (error) {
