@@ -7,7 +7,7 @@ const Transferts = require("../models/Transfer");
 exports.getcircle = async (req, res) => {
   try {
     // Aggregate sales data
-    const salesData = await Vente.aggregate([
+    const aggregation = await Vente.aggregate([
       {
         $group: {
           _id: "$centre", // Group by the "centre" field in your Vente schema
@@ -17,7 +17,6 @@ exports.getcircle = async (req, res) => {
       {
         $group: {
           _id: null,
-          total: { $sum: "$totalSales" },
           centers: {
             $push: {
               centreCode: "$_id",
@@ -27,25 +26,25 @@ exports.getcircle = async (req, res) => {
         },
       },
       {
-        $unwind: "$centers",
-      },
-      {
         $project: {
           _id: 0, // Exclude _id field from the result
-          centreCode: "$centers.centreCode",
+          centreCodes: "$centers.centreCode",
           totalSales: "$centers.totalSales",
-          percentage: {
-            $multiply: [{ $divide: ["$centers.totalSales", "$total"] }, 100],
-          },
         },
       },
     ]);
 
-    res.json(salesData);
+    // From the aggregation result, extract arrays of centre codes and total sales
+    const centreCodes = aggregation[0].centreCodes;
+    const totalSales = aggregation[0].totalSales;
+
+    // Send the arrays back in the response
+    res.json({ centreCodes, totalSales });
   } catch (error) {
     res.status(500).send(error);
   }
 };
+
 
 // Route to get total purchase amount for "Centre 1" by month
 exports.getTotalPurchaseByMonth = async (req, res) => {
