@@ -118,7 +118,7 @@ exports.getAllAchats = async (req, res) => {
         // Fetch product details
         const product = await Product.findOne({
           code: achat.id_produit,
-        }).select("name"); // Replace 'productId' and 'name' with actual field names in your Product model
+        }).select("name"); 
         achat.productDetails = product; // Add product details to achat
 
         return achat;

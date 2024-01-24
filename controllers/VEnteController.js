@@ -38,11 +38,11 @@ exports.createVente = async (req, res) => {
         .status(404)
         .send({ message: "the quantite of this product not enaughe" });
     }
+    const newVente = await Ventes.create(req.body);
     if (status === "Partiellement payé") {
-      clienttExists.credit = this.montantTotal - montantEncaisse;
+      clienttExists.credit = newVente.montantTotal - montantEncaisse;
       clienttExists.save();
     }
-    const newVente = await Ventes.create(req.body);
     res.status(201).json(newVente);
   } catch (error) {
     res.status(500).json({ error: error.message });
