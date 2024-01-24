@@ -6,12 +6,13 @@ const ProduitStock = require("../models/produitStock");
 exports.createAchat = async (req, res) => {
   const {
     id_fournisseur,
-    produit,
+    id_produit,
     quantite,
     statusPaiement,
     prixUnitaireHT,
     montantVerse,
   } = req.body;
+
   try {
     // Check if the Fournisseur exists
     const fournisseurExists = await Fournisseur.findOne({
@@ -21,7 +22,7 @@ exports.createAchat = async (req, res) => {
       return res.status(404).send({ message: "Fournisseur not found" });
     }
     // Check if the Product exists
-    const productExists = await Product.findOne({ name: produit });
+    const productExists = await Product.findOne({ code: id_produit });
 
     if (productExists) {
       const produitStockExists = await ProduitStock.findOne({
@@ -41,48 +42,26 @@ exports.createAchat = async (req, res) => {
         });
         await newProduitStock.save();
       }
-    } else {
-      // Create a new product
-      const newProduct = new Product({
-        name: produit,
-        price: prixUnitaireHT,
-      });
-      await newProduct.save();
-
-      // Create a new produit stock entry for the new product
-      const newProduitStock = new ProduitStock({
-        produit: newProduct.code,
-        centre: 1,
-        quantite: quantite,
-      });
-      await newProduitStock.save();
     }
 
     // Create the Achat
     const newAchat = new Achat({
       id_fournisseur,
+      id_produit,
       quantite,
       statusPaiement,
       prixUnitaireHT,
       fournisseurname: fournisseurExists.nom,
       fournisseurprenom: fournisseurExists.prenom,
-      produitname: produit,
       montantVerse: montantVerse,
     });
+    await newAchat.save();
 
     // Calculate soldeRestant based on statusPaiement
-
     if (statusPaiement === "Partiellement payé") {
-      let soldeRestant = 0;
-      const calculatedValue = newAchat.montantTotalHT - montantVerse;
-      if (!isNaN(calculatedValue)) {
-        soldeRestant = calculatedValue;
-      } else {
-        // Handle error or set a default value for soldeRestant
-        soldeRestant = 0; // or any appropriate handling
-      }
-
-      fournisseurExists.solde += soldeRestant;
+      const soldeRestant =
+        parseInt(newAchat.montantTotalHT) - parseInt(montantVerse);
+      fournisseurExists.solde += parseInt(soldeRestant);
       newAchat.soldeRestant = soldeRestant;
       await fournisseurExists.save();
       await newAchat.save();
@@ -135,6 +114,12 @@ exports.getAllAchats = async (req, res) => {
           code: achat.id_fournisseur,
         }).select("nom prenom"); // Adjust the field name as per your Fournisseur model
         achat.fournisseurDetails = fournisseur; // Add fournisseur details to achat
+
+        // Fetch product details
+        const product = await Product.findOne({
+          code: achat.id_produit,
+        }).select("name"); // Replace 'productId' and 'name' with actual field names in your Product model
+        achat.productDetails = product; // Add product details to achat
 
         return achat;
       })

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Produit = require("./Produit");
 const CounterAchat = require("./counters/achatscounter");
 const AchatsSchema = new mongoose.Schema({
   code: { type: Number, unique: true, index: true },
@@ -13,7 +14,12 @@ const AchatsSchema = new mongoose.Schema({
   },
   fournisseurname: { type: String, default: "" },
   fournisseurprenom: { type: String, default: "" },
-  produitname: { type: String, required: true },
+  id_produit: {
+    type: Number,
+    ref: "Produit",
+    required: true,
+  },
+
   quantite: {
     type: Number,
     required: true,
@@ -27,8 +33,8 @@ const AchatsSchema = new mongoose.Schema({
   },
   montantVerse: {
     type: Number,
-
-    reuired: true,
+    default: 0,
+    required: true,
   },
   soldeRestant: {
     type: Number,
@@ -50,6 +56,7 @@ AchatsSchema.pre("save", async function (next) {
         { new: true, upsert: true }
       );
       this.code = counterDoc.seq;
+      // Continue with the rest of the pre-save logic...
     } catch (err) {
       return next(err);
     }
@@ -58,7 +65,9 @@ AchatsSchema.pre("save", async function (next) {
   }
   try {
     this.montantTotalHT = this.quantite * this.prixUnitaireHT;
-
+    if (this.statusPaiement === "Partiellement payé") {
+      this.soldeRestant = this.montantTotalHT - this.versement;
+    }
     next();
   } catch (err) {
     next(err);
