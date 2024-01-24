@@ -10,7 +10,7 @@ exports.createreglementfou = async (req, res) => {
     if (!fournisseurExists) {
       return res.status(404).send({ message: "fournisseur not found" });
     }
-    if (fournisseurExists.solde != 0) {
+    if (fournisseurExists.solde > 0) {
       fournisseurExists.solde -= montantReglement;
       fournisseurExists.save();
     }

@@ -22,8 +22,6 @@ fournisseurSchema.pre("save", async function (next) {
     next();
   }
   try {
-    this.solde = 0;
-
     next();
   } catch (err) {
     next(err);
