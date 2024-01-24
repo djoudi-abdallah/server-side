@@ -1,19 +1,11 @@
 const Reglements = require("../models/ReglementFournisseur");
-const Centre = require("../models/Centre");
 const Fournisseur = require("../models/Fournisseur");
 
 // Create a new payment
 exports.createreglementfou = async (req, res) => {
-  const { centre, fournisseur,montantReglement } = req.body;
+  const {  fournisseur,montantReglement } = req.body;
   try {
-    // Check if the centre exists
-    const centreExists = await Centre.findOne({
-      code: centre,
-    });
-    if (!centreExists) {
-      return res.status(404).send({ message: "centre not found" });
-    }
-
+    
     // Check if the fournisseur exists
     const fournisseurExists = await Fournisseur.findOne({ code: fournisseur });
     if (!fournisseurExists) {

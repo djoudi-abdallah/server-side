@@ -2,17 +2,15 @@ const Achat = require("../models/Achats");
 const Fournisseur = require("../models/Fournisseur");
 const Product = require("../models/Produit");
 const ProduitStock = require("../models/produitStock");
-const Centre = require("../models/Centre");
 
 exports.createAchat = async (req, res) => {
   const {
     id_fournisseur,
-    id_produit,
+    produit,
     quantite,
     statusPaiement,
-    soldeRestant,
-    centre,
     prixUnitaireHT,
+    montantVerse,
   } = req.body;
   try {
     // Check if the Fournisseur exists
@@ -22,67 +20,84 @@ exports.createAchat = async (req, res) => {
     if (!fournisseurExists) {
       return res.status(404).send({ message: "Fournisseur not found" });
     }
-
-    // check if the centre exicte
-    const centreExists = await Centre.findOne({
-      code: centre,
-    });
-    if (!centreExists) {
-      return res.status(404).send({ message: "centre not found" });
-    }
-
     // Check if the Product exists
-    const productExists = await Product.findOne({ code: id_produit });
-    if (!productExists) {
-      return res.status(404).send({ message: "Product not found" });
-    }
-    if (statusPaiement === "Partiellement payé") {
-      fournisseurExists.solde += soldeRestant;
+    const productExists = await Product.findOne({ name: produit });
+
+    if (productExists) {
+      const produitStockExists = await ProduitStock.findOne({
+        produit: productExists.code,
+        centre: 1,
+      });
+      // Update in ProduitStock
+      if (produitStockExists) {
+        produitStockExists.quantite += quantite;
+        await produitStockExists.save();
+      } else {
+        // Create a new produit stock entry for the existing product
+        const newProduitStock = new ProduitStock({
+          produit: productExists.code,
+          centre: 1,
+          quantite: quantite,
+        });
+        await newProduitStock.save();
+      }
+    } else {
+      // Create a new product
+      const newProduct = new Product({
+        name: produit,
+        price: prixUnitaireHT,
+      });
+      await newProduct.save();
+
+      // Create a new produit stock entry for the new product
+      const newProduitStock = new ProduitStock({
+        produit: newProduct.code,
+        centre: 1,
+        quantite: quantite,
+      });
+      await newProduitStock.save();
     }
 
     // Create the Achat
     const newAchat = new Achat({
       id_fournisseur,
-      id_produit,
       quantite,
       statusPaiement,
       prixUnitaireHT,
-      soldeRestant,
-      centre,
       fournisseurname: fournisseurExists.nom,
       fournisseurprenom: fournisseurExists.prenom,
+      produitname: produit,
+      montantVerse: montantVerse,
     });
-    await newAchat.save();
 
-    // Update or create a new entry in ProduitStock
-    const produitStockEntry = await ProduitStock.findOne({
-      id_produit: id_produit,
-    });
-    if (produitStockEntry) {
-      produitStockEntry.quantite += quantite;
-      await produitStockEntry.save();
-    } else {
-      const newProduitStockEntry = new ProduitStock({
-        produit: id_produit,
-        quantite: quantite,
-        centre: 1,
-      });
-      await newProduitStockEntry.save();
-    }
-    if (!statusPaiement) {
-      const fournisseur = await Fournisseur.findOne({
-        code: id_fournisseur,
-      });
+    // Calculate soldeRestant based on statusPaiement
 
-      if (fournisseur) {
-        fournisseur.solde += newAchat.montantTotalHT;
-
-        await fournisseur.save();
+    if (statusPaiement === "Partiellement payé") {
+      let soldeRestant = 0;
+      const calculatedValue = newAchat.montantTotalHT - montantVerse;
+      if (!isNaN(calculatedValue)) {
+        soldeRestant = calculatedValue;
       } else {
-        throw new Error("Fournisseur not found");
+        // Handle error or set a default value for soldeRestant
+        soldeRestant = 0; // or any appropriate handling
       }
-      newAchat.reste = newAchat.montantTotalHT;
+
+      fournisseurExists.solde += soldeRestant;
+      newAchat.soldeRestant = soldeRestant;
+      await fournisseurExists.save();
       await newAchat.save();
+    }
+
+    // Save newAchat after soldeRestant calculation
+
+    if (statusPaiement === "Non payé") {
+      fournisseurExists.solde += newAchat.montantTotalHT;
+      await fournisseurExists.save();
+      newAchat.soldeRestant = newAchat.montantTotalHT;
+      await fournisseurExists.save();
+      await newAchat.save();
+    } else {
+      fournisseurExists.solde = 0;
     }
 
     res.status(201).send({

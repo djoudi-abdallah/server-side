@@ -126,8 +126,11 @@ exports.getTopProducts = async (req, res) => {
 
 exports.mostrecentlyvendu = async (req, res) => {
   try {
-    // Récupération des ventes récentes
-    const recentSales = await Vente.find({ centre: 1 })
+    // Récupération du centre à partir de la requête
+    const centre = req.params.id; // Assurez-vous que le paramètre centre est correctement passé dans la requête
+
+    // Récupération des ventes récentes pour le centre spécifié
+    const recentSales = await Vente.find({ centre: centre })
       .sort({ dateVente: -1 })
       .limit(10);
 
@@ -167,39 +170,39 @@ exports.getprofit = async (req, res) => {
 
     // Filter and Aggregate total sales for the specified centre for each month of the current year
     const salesResult = await Vente.aggregate([
-      { 
-        $match: { 
+      {
+        $match: {
           centre: centreId,
-          dateVente: { 
+          dateVente: {
             $gte: new Date(`${currentYear}-01-01`),
-            $lte: new Date(`${currentYear}-12-31`)
-          }
-        } 
+            $lte: new Date(`${currentYear}-12-31`),
+          },
+        },
       },
-      { 
+      {
         $group: {
           _id: { $month: "$dateVente" },
-          totalSales: { $sum: "$montantTotal" }
-        }
+          totalSales: { $sum: "$montantTotal" },
+        },
       },
     ]);
 
     // Filter and Aggregate total transfer costs for the specified centre for each month of the current year
     const transferResult = await Transferts.aggregate([
-      { 
-        $match: { 
+      {
+        $match: {
           centre: centreId,
-          dateTransfert: { 
+          dateTransfert: {
             $gte: new Date(`${currentYear}-01-01`),
-            $lte: new Date(`${currentYear}-12-31`)
-          } 
-        } 
+            $lte: new Date(`${currentYear}-12-31`),
+          },
+        },
       },
-      { 
+      {
         $group: {
           _id: { $month: "$dateTransfert" },
-          totalTransferCost: { $sum: "$coutEquivalent" }
-        }
+          totalTransferCost: { $sum: "$coutEquivalent" },
+        },
       },
     ]);
 
@@ -222,5 +225,3 @@ exports.getprofit = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
-
-

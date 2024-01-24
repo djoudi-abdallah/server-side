@@ -1,6 +1,4 @@
 const mongoose = require("mongoose");
-const Produit = require("./Produit");
-const Employe = require("./Employe");
 const CounterAchat = require("./counters/achatscounter");
 const AchatsSchema = new mongoose.Schema({
   code: { type: Number, unique: true, index: true },
@@ -15,12 +13,7 @@ const AchatsSchema = new mongoose.Schema({
   },
   fournisseurname: { type: String, default: "" },
   fournisseurprenom: { type: String, default: "" },
-  id_produit: {
-    type: Number,
-    ref: "Produit",
-    required: true,
-  },
-
+  produitname: { type: String, required: true },
   quantite: {
     type: Number,
     required: true,
@@ -34,7 +27,8 @@ const AchatsSchema = new mongoose.Schema({
   },
   montantVerse: {
     type: Number,
-    default: 0,
+
+    reuired: true,
   },
   soldeRestant: {
     type: Number,
@@ -45,7 +39,6 @@ const AchatsSchema = new mongoose.Schema({
     enum: ["Entièrement payé", "Partiellement payé", "Non payé"],
     default: "Non payé",
   },
-  centre: { type: Number, ref: "Centre", required: true },
 });
 
 AchatsSchema.pre("save", async function (next) {
@@ -57,7 +50,6 @@ AchatsSchema.pre("save", async function (next) {
         { new: true, upsert: true }
       );
       this.code = counterDoc.seq;
-      // Continue with the rest of the pre-save logic...
     } catch (err) {
       return next(err);
     }
@@ -65,16 +57,9 @@ AchatsSchema.pre("save", async function (next) {
     next();
   }
   try {
-    const produit = await Produit.findOne({ code: this.id_produit });
-    if (!produit) {
-      next(new Error("Produit not found"));
-    } else {
-      this.montantTotalHT = this.quantite * this.prixUnitaireHT;
-      if (this.statusPaiement === "Partiellement payé") {
-        this.soldeRestant = this.montantTotalHT - this.versement;
-      }
-      next();
-    }
+    this.montantTotalHT = this.quantite * this.prixUnitaireHT;
+
+    next();
   } catch (err) {
     next(err);
   }
