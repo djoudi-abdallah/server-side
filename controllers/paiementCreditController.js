@@ -19,8 +19,9 @@ exports.createPaiement = async (req, res) => {
     if (!clienttExists) {
       return res.status(404).send({ message: "client not found" });
     }
-    if (clienttExists.credit !== 0) {
+    if (clienttExists.credit > 0) {
       clienttExists.credit -= amountPaid;
+      clienttExists.save();
     }
     clienttExists.save();
     const newPaiementCredit = await PaiementCredit.create(req.body);
