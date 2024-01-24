@@ -30,20 +30,26 @@ exports.createTrasnsfer = async (req, res) => {
       coutEquivalent = quantite * achatsDetails.prixUnitaireHT;
     }
 
-    const produitStockEntry = await ProduitStock.findOne({
+    const produitStockmain = await ProduitStock.findOne({
       id_produit: id_produit,
+      centre: 1,
     });
-    if (produitStockEntry) {
-      produitStockEntry.quantite += quantite;
-      await produitStockEntry.save();
-    } else {
-      const newProduitStockEntry = new ProduitStock({
-        produit: id_produit,
-        quantite: quantite,
-        centre,
-      });
-      await newProduitStockEntry.save();
+    if (produitStockmain) {
+      produitStockmain.quantite -= quantite;
+      await produitStockmain.save();
     }
+
+    const ProduitStockEntry = await ProduitStock.findOne({
+      produit: id_produit,
+      centre: centre,
+    });
+    if (ProduitStockEntry) {
+      ProduitStockEntry.quantite += quantite;
+      await ProduitStockEntry.save();
+    }
+
+    await ProduitStockEntry.save();
+
     const response = {
       ...req.body,
       coutEquivalent: coutEquivalent, // assuming this line is correct
