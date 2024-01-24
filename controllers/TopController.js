@@ -93,7 +93,6 @@ exports.getCentreOverviewForCentre1 = async (req, res) => {
 
     // Top Supplier (Fournisseur)
     const topSupplierResult = await Achats.aggregate([
-      { $match: centreFilter },
       {
         $group: {
           _id: "$id_fournisseur",
