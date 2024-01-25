@@ -50,7 +50,6 @@ exports.getTotalPurchaseByMonth = async (req, res) => {
   try {
     // Aggregate sales data for "Centre 1"
     const salesData = await achat.aggregate([
-      {},
       {
         $group: {
           _id: {
