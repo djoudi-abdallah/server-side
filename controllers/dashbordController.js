@@ -45,17 +45,12 @@ exports.getcircle = async (req, res) => {
   }
 };
 
-
 // Route to get total purchase amount for "Centre 1" by month
 exports.getTotalPurchaseByMonth = async (req, res) => {
   try {
     // Aggregate sales data for "Centre 1"
     const salesData = await achat.aggregate([
-      {
-        $match: {
-          centre: 1, // Filter by "Centre 1"
-        },
-      },
+      {},
       {
         $group: {
           _id: {
